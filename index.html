@@ -74,24 +74,57 @@
       animation: pricePulse 200ms cubic-bezier(0.2, 0, 0, 1);
     }
 
-    /* Hardware-Accelerated Floating Mobile Menu Overlay */
-    #mobile-menu {
-      background-color: #ffffff !important;
-      transform: translate3d(0, -10px, 0);
+    /* Hardware-Accelerated High-Performance Side Drawer & Backdrop */
+    #mobile-backdrop {
       opacity: 0;
-      visibility: hidden;
       pointer-events: none;
-      will-change: transform, opacity;
-      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), 
-                  opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), 
-                  visibility 220ms;
+      touch-action: none;
+      will-change: opacity;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    #mobile-menu.menu-open {
-      transform: translate3d(0, 0, 0);
+    #mobile-backdrop.open {
       opacity: 1;
-      visibility: visible;
       pointer-events: auto;
     }
+
+    #mobile-drawer {
+      transform: translate3d(100%, 0, 0);
+      pointer-events: none;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      contain: layout paint style;
+      transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y;
+    }
+    #mobile-drawer.open {
+      transform: translate3d(0, 0, 0);
+      pointer-events: auto;
+    }
+    #mobile-drawer.swiping {
+      transition: none !important;
+    }
+
+    /* Staggered entry animation for mobile drawer items */
+    .drawer-stagger-item {
+      opacity: 0;
+      transform: translateX(14px);
+      transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1), transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #mobile-drawer.open .drawer-stagger-item {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    #mobile-drawer.open .drawer-stagger-1 { transition-delay: 40ms; }
+    #mobile-drawer.open .drawer-stagger-2 { transition-delay: 80ms; }
+    #mobile-drawer.open .drawer-stagger-3 { transition-delay: 120ms; }
+    #mobile-drawer.open .drawer-stagger-4 { transition-delay: 160ms; }
+    #mobile-drawer.open .drawer-stagger-5 { transition-delay: 200ms; }
+    #mobile-drawer.open .drawer-stagger-6 { transition-delay: 240ms; }
+    #mobile-drawer.open .drawer-stagger-7 { transition-delay: 280ms; }
 
     /* Accessibility: Respect Reduced Motion Preference */
     @media (prefers-reduced-motion: reduce) {
@@ -198,54 +231,186 @@
 
         <!-- Mobile Menu Button with comfortable 44px tap target -->
         <button id="mobile-menu-btn" type="button" class="lg:hidden p-2 sm:p-2.5 rounded-lg text-slate-800 hover:bg-slate-100 transition-colors border border-slate-300 bg-slate-50 min-w-[40px] min-h-[40px] flex items-center justify-center active:bg-slate-200" aria-label="Otwórz menu mobilne" aria-expanded="false">
-          <span id="menu-icon-wrap" class="flex items-center justify-center pointer-events-none">
-            <i data-lucide="menu" class="w-5 h-5 text-slate-800"></i>
-          </span>
-          <span id="close-icon-wrap" class="hidden flex items-center justify-center pointer-events-none">
-            <i data-lucide="x" class="w-5 h-5 text-slate-800"></i>
-          </span>
+          <i data-lucide="menu" class="w-5 h-5 text-slate-800"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Backdrop Scrim (Dims page when drawer is open) -->
+  <div id="mobile-backdrop" class="fixed inset-0 bg-slate-950/60 z-[60] lg:hidden backdrop-blur-sm" aria-hidden="true"></div>
+
+  <!-- Mobile Slide-In Side Drawer (Hardware-Accelerated Off-Canvas with Swipe Gesture) -->
+  <aside id="mobile-drawer" role="dialog" aria-modal="true" aria-labelledby="mobile-drawer-title" class="fixed top-0 bottom-0 right-0 w-[92%] max-w-[400px] h-full bg-white z-[70] shadow-2xl flex flex-col overflow-y-auto overscroll-contain lg:hidden border-l border-slate-200" aria-hidden="true">
+
+    <!-- Drawer Header with Logo, Status Pill & Accessible Close Button -->
+    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between gap-3 bg-white/95 backdrop-blur-md sticky top-0 z-20 shrink-0">
+      <a class="flex items-center gap-3 shrink min-w-0 group" href="#" onclick="closeMobileMenu()" aria-label="Strona główna GGhaft">
+        <img alt="GGhaft Logo" class="h-8 w-auto max-h-[32px] object-contain shrink-0" src="images/logo-tight.png"/>
+        <div class="flex flex-col border-l border-slate-200 pl-2.5 justify-center">
+          <div class="flex items-center gap-1.5">
+            <span id="mobile-drawer-title" class="font-headline font-bold text-sm tracking-tight text-slate-900 leading-none">GGHAFT</span>
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" title="Pracownia aktywna"></span>
+          </div>
+          <span class="text-[10px] font-semibold text-slate-500 tracking-wider mt-0.5">Haft &amp; Druk DTF</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <button id="close-drawer-btn" type="button" class="p-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all border border-slate-200 min-w-[42px] min-h-[42px] flex items-center justify-center active:scale-95 cursor-pointer bg-slate-50/80 shadow-2xs" aria-label="Zamknij menu mobilne">
+          <i data-lucide="x" class="w-5 h-5 text-slate-800"></i>
         </button>
       </div>
     </div>
 
-    <!-- Mobile Floating Drawer (Hardware Accelerated & Zero DOM Push) -->
-    <div id="mobile-menu" class="absolute top-full left-0 right-0 w-full lg:hidden border-b border-slate-200 bg-white px-4 py-3 shadow-2xl z-50" aria-hidden="true">
-      <nav class="flex flex-col gap-1 text-sm font-semibold text-slate-800">
-        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#uslugi">
-          <i data-lucide="layers" class="w-4 h-4 text-blue-600 shrink-0"></i>
-          <span>Technologie &amp; Usługi</span>
-        </a>
-        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#realizacje">
-          <i data-lucide="image" class="w-4 h-4 text-blue-600 shrink-0"></i>
-          <span>Realizacje i Galeria</span>
-        </a>
-        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#kalkulator">
-          <i data-lucide="calculator" class="w-4 h-4 text-blue-600 shrink-0"></i>
-          <span>Kalkulator Wyceny</span>
-        </a>
-        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#standard">
-          <i data-lucide="shield-check" class="w-4 h-4 text-blue-600 shrink-0"></i>
-          <span>Standard Jakości</span>
-        </a>
-        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#kontakt">
-          <i data-lucide="map-pin" class="w-4 h-4 text-blue-600 shrink-0"></i>
-          <span>Pracownia &amp; Kontakt</span>
-        </a>
+    <!-- Drawer Body -->
+    <div class="p-4 sm:p-5 flex-1 flex flex-col justify-start space-y-4 min-h-0">
+      
+      <!-- Navigation Section Label -->
+      <div class="drawer-stagger-item drawer-stagger-1 px-1 flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Nawigacja główna</span>
+        <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">B2B &amp; Detal</span>
+      </div>
+
+      <!-- Navigation Cards List (Clean, Rich & Comfortably Sized) -->
+      <nav class="space-y-2" aria-label="Sekcje strony">
         
-        <!-- Mobile Drawer Quick Actions -->
-        <div class="pt-3 mt-2 border-t border-slate-200 grid grid-cols-1 gap-2">
-          <a class="flex items-center justify-center gap-2 w-full bg-slate-900 text-white py-3 rounded-lg text-xs font-bold transition-colors shadow-xs active:scale-[0.98]" href="tel:+48513770517">
-            <i data-lucide="phone" class="w-4 h-4 text-blue-400"></i>
-            <span>Zadzwoń: +48 513 770 517</span>
-          </a>
-          <a class="flex items-center justify-center gap-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 rounded-lg text-xs font-bold transition-colors border border-slate-300" href="mailto:biuro@gghaft.pl">
-            <i data-lucide="mail" class="w-4 h-4 text-blue-600"></i>
-            <span>Napisz: biuro@gghaft.pl</span>
-          </a>
-        </div>
+        <!-- Item 1: Kalkulator (Featured Interactive Hero Item) -->
+        <a class="mobile-nav-link drawer-stagger-item drawer-stagger-2 flex items-center gap-3.5 p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/90 to-indigo-50/70 hover:from-blue-100/90 hover:to-indigo-100/70 border border-blue-200 active:bg-blue-200 transition-all group shadow-2xs" href="#kalkulator">
+          <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+            <i data-lucide="calculator" class="w-5.5 h-5.5"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm sm:text-base text-blue-950 block leading-tight">Kalkulator Wyceny</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-blue-600 text-white tracking-wide uppercase">60s</span>
+            </div>
+            <span class="text-xs sm:text-[13px] text-blue-700 font-medium block truncate mt-0.5">Natychmiastowy szacunek ceny live</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-blue-500 group-hover:translate-x-0.5 transition-transform"></i>
+        </a>
+
+        <!-- Item 2: Usługi & Technologie -->
+        <a class="mobile-nav-link drawer-stagger-item drawer-stagger-3 flex items-center gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 active:bg-blue-50 transition-all group" href="#uslugi">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-50 group-hover:scale-105 transition-all">
+            <i data-lucide="layers" class="w-5.5 h-5.5"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <span class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-blue-600 transition-colors block leading-tight">Technologie &amp; Usługi</span>
+            <span class="text-xs sm:text-[13px] text-slate-500 block truncate mt-0.5">Haft Tajima 15-kol., Druk DTF, Hurt</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-transform"></i>
+        </a>
+
+        <!-- Item 3: Realizacje & Portfolio -->
+        <a class="mobile-nav-link drawer-stagger-item drawer-stagger-4 flex items-center gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 active:bg-blue-50 transition-all group" href="#realizacje">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:scale-105 transition-all">
+            <i data-lucide="image" class="w-5.5 h-5.5"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-blue-600 transition-colors block leading-tight">Realizacje &amp; Portfolio</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600 tracking-wide">Makro HD</span>
+            </div>
+            <span class="text-xs sm:text-[13px] text-slate-500 block truncate mt-0.5">Fotografie ściegów, haft 3D, detale</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-transform"></i>
+        </a>
+
+        <!-- Item 4: Standard Jakości -->
+        <a class="mobile-nav-link drawer-stagger-item drawer-stagger-5 flex items-center gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 active:bg-blue-50 transition-all group" href="#standard">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:scale-105 transition-all">
+            <i data-lucide="shield-check" class="w-5.5 h-5.5"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <span class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-blue-600 transition-colors block leading-tight">Standard Jakości</span>
+            <span class="text-xs sm:text-[13px] text-slate-500 block truncate mt-0.5">4-etapowa kontrola, darmowa próba</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-transform"></i>
+        </a>
+
+        <!-- Item 5: Pracownia & Kontakt -->
+        <a class="mobile-nav-link drawer-stagger-item drawer-stagger-6 flex items-center gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 active:bg-blue-50 transition-all group" href="#kontakt">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:scale-105 transition-all">
+            <i data-lucide="map-pin" class="w-5.5 h-5.5"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <span class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-blue-600 transition-colors block leading-tight">Pracownia &amp; Dojazd</span>
+            <span class="text-xs sm:text-[13px] text-slate-500 block truncate mt-0.5">Krzyszkowice 388 (S7 Zakopianka)</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-transform"></i>
+        </a>
+
       </nav>
+
+      <!-- Industrial Workshop Specs (Comfortable Sized Grid) -->
+      <div class="drawer-stagger-item drawer-stagger-7 pt-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block px-1 mb-2">Gwarancje produkcyjne</span>
+        <div class="grid grid-cols-2 gap-2">
+          
+          <div class="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2.5 text-xs sm:text-[13px] font-bold text-slate-800">
+            <div class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="truncate">Tajima 15 kol.</span>
+          </div>
+
+          <div class="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2.5 text-xs sm:text-[13px] font-bold text-slate-800">
+            <div class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="truncate">Nici Madeira</span>
+          </div>
+
+          <div class="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2.5 text-xs sm:text-[13px] font-bold text-slate-800">
+            <div class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <i data-lucide="badge-check" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="truncate">Próba 0 zł</span>
+          </div>
+
+          <div class="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2.5 text-xs sm:text-[13px] font-bold text-slate-800">
+            <div class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="truncate">Wysyłka 24-48h</span>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-  </header>
+
+    <!-- Drawer Sticky/Bottom Action Hub -->
+    <div class="px-5 py-3.5 border-t border-slate-100 bg-slate-50/95 space-y-2.5 mt-auto shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      
+      <!-- Primary Fast Contact Buttons -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <a class="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs active:scale-[0.98]" href="tel:+48513770517">
+          <i data-lucide="phone-call" class="w-4 h-4 text-blue-400"></i>
+          <span>513 770 517</span>
+        </a>
+        <a class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs active:scale-[0.98]" href="mailto:biuro@gghaft.pl">
+          <i data-lucide="mail" class="w-4 h-4"></i>
+          <span>Napisz e-mail</span>
+        </a>
+      </div>
+
+      <!-- Route & Working Hours Info -->
+      <div class="flex items-center justify-between px-1 text-xs text-slate-500 font-medium">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Pn–Pt: 08:00 – 17:00</span>
+        </div>
+        <a href="https://maps.google.com/?q=Krzyszkowice+388" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold hover:underline flex items-center gap-1">
+          <span>Mapa S7</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+
+    </div>
+
+  </aside>
 
   <main class="w-full flex-1">
     
@@ -1287,57 +1452,157 @@
     document.addEventListener("DOMContentLoaded", function() {
       initIcons();
 
-      // 1. Mobile Menu Smooth Drawer Toggle
+      // 1. Mobile Side Drawer & Backdrop Controller (Touch gestures, A11y & Focus Trapping)
       const menuBtn = document.getElementById("mobile-menu-btn");
-      const mobileMenu = document.getElementById("mobile-menu");
-      const menuIconWrap = document.getElementById("menu-icon-wrap");
-      const closeIconWrap = document.getElementById("close-icon-wrap");
+      const closeDrawerBtn = document.getElementById("close-drawer-btn");
+      const mobileBackdrop = document.getElementById("mobile-backdrop");
+      const mobileDrawer = document.getElementById("mobile-drawer");
       const navLinks = document.querySelectorAll(".mobile-nav-link");
+      let previouslyFocusedElement = null;
 
       function openMobileMenu() {
-        if (!mobileMenu || !menuBtn) return;
-        menuBtn.setAttribute("aria-expanded", "true");
-        mobileMenu.classList.add("menu-open");
-        mobileMenu.setAttribute("aria-hidden", "false");
-        if (menuIconWrap && closeIconWrap) {
-          menuIconWrap.classList.add("hidden");
-          closeIconWrap.classList.remove("hidden");
-        }
+        if (!mobileDrawer) return;
+        previouslyFocusedElement = document.activeElement;
+        
+        if (menuBtn) menuBtn.setAttribute("aria-expanded", "true");
+        if (mobileBackdrop) mobileBackdrop.classList.add("open");
+        
+        mobileDrawer.classList.remove("swiping");
+        mobileDrawer.style.transform = "";
+        mobileDrawer.classList.add("open");
+        mobileDrawer.setAttribute("aria-hidden", "false");
+        
+        // Prevent background scrolling cleanly
+        document.body.classList.add("overflow-hidden");
+        
+        // Focus the close button or first focusable link for accessibility
+        setTimeout(function() {
+          if (closeDrawerBtn) {
+            closeDrawerBtn.focus();
+          }
+        }, 50);
       }
 
       function closeMobileMenu() {
-        if (!mobileMenu || !menuBtn) return;
-        menuBtn.setAttribute("aria-expanded", "false");
-        mobileMenu.classList.remove("menu-open");
-        mobileMenu.setAttribute("aria-hidden", "true");
-        if (menuIconWrap && closeIconWrap) {
-          menuIconWrap.classList.remove("hidden");
-          closeIconWrap.classList.add("hidden");
+        if (!mobileDrawer) return;
+        
+        if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+        if (mobileBackdrop) {
+          mobileBackdrop.classList.remove("open");
+          mobileBackdrop.style.opacity = "";
+        }
+        
+        mobileDrawer.classList.remove("swiping");
+        mobileDrawer.style.transform = "";
+        mobileDrawer.classList.remove("open");
+        mobileDrawer.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("overflow-hidden");
+
+        // Restore focus to trigger
+        if (previouslyFocusedElement && typeof previouslyFocusedElement.focus === "function") {
+          previouslyFocusedElement.focus();
         }
       }
 
-      if (menuBtn && mobileMenu) {
-        menuBtn.addEventListener("click", function(e) {
-          e.stopPropagation();
-          const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
-          if (isExpanded) {
+      window.openMobileMenu = openMobileMenu;
+      window.closeMobileMenu = closeMobileMenu;
+
+      if (menuBtn) {
+        menuBtn.addEventListener("click", openMobileMenu);
+      }
+      if (closeDrawerBtn) {
+        closeDrawerBtn.addEventListener("click", closeMobileMenu);
+      }
+      if (mobileBackdrop) {
+        mobileBackdrop.addEventListener("click", closeMobileMenu);
+      }
+
+      navLinks.forEach(function(link) {
+        link.addEventListener("click", closeMobileMenu);
+      });
+
+      // Swipe / Drag to Dismiss Gesture on Mobile
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let currentDeltaX = 0;
+      let isDragging = false;
+
+      if (mobileDrawer) {
+        mobileDrawer.addEventListener("touchstart", function(e) {
+          if (!mobileDrawer.classList.contains("open")) return;
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+          currentDeltaX = 0;
+          isDragging = false;
+        }, { passive: true });
+
+        mobileDrawer.addEventListener("touchmove", function(e) {
+          if (!mobileDrawer.classList.contains("open")) return;
+          const touch = e.touches[0];
+          const diffX = touch.clientX - touchStartX;
+          const diffY = touch.clientY - touchStartY;
+
+          // If horizontal swipe to the right is dominant
+          if (diffX > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+            isDragging = true;
+            currentDeltaX = Math.max(0, diffX);
+            mobileDrawer.classList.add("swiping");
+            mobileDrawer.style.transform = `translate3d(${currentDeltaX}px, 0, 0)`;
+            
+            if (mobileBackdrop) {
+              const maxDistance = mobileDrawer.offsetWidth || 300;
+              const opacity = Math.max(0, 1 - (currentDeltaX / maxDistance));
+              mobileBackdrop.style.opacity = opacity.toString();
+            }
+          }
+        }, { passive: true });
+
+        mobileDrawer.addEventListener("touchend", function() {
+          if (!isDragging) return;
+          isDragging = false;
+          mobileDrawer.classList.remove("swiping");
+
+          if (currentDeltaX > 75) {
             closeMobileMenu();
           } else {
-            openMobileMenu();
+            // Snap back
+            mobileDrawer.style.transform = "";
+            if (mobileBackdrop) mobileBackdrop.style.opacity = "";
           }
-        });
-
-        navLinks.forEach(function(link) {
-          link.addEventListener("click", closeMobileMenu);
-        });
-
-        // Close on clicking anywhere outside
-        document.addEventListener("click", function(e) {
-          if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
-            closeMobileMenu();
-          }
-        });
+          currentDeltaX = 0;
+        }, { passive: true });
       }
+
+      // Keyboard Trap & Escape Key Support
+      document.addEventListener("keydown", function(e) {
+        if (!mobileDrawer || !mobileDrawer.classList.contains("open")) return;
+
+        if (e.key === "Escape") {
+          closeMobileMenu();
+          return;
+        }
+
+        if (e.key === "Tab") {
+          const focusables = mobileDrawer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          if (focusables.length === 0) return;
+
+          const firstFocusable = focusables[0];
+          const lastFocusable = focusables[focusables.length - 1];
+
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+              lastFocusable.focus();
+              e.preventDefault();
+            }
+          } else {
+            if (document.activeElement === lastFocusable) {
+              firstFocusable.focus();
+              e.preventDefault();
+            }
+          }
+        }
+      });
 
       // 2. Industrial Metric Counters on Scroll
       const metricCounters = document.querySelectorAll(".metric-counter");
