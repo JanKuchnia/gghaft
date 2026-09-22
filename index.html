@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="scroll-smooth">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+  <meta name="theme-color" content="#ffffff"/>
   <meta content="Przemysłowy haft komputerowy i druk DTF w Krzyszkowicach k. Myślenic. Japońskie maszyny Tajima, nici Madeira, ekspresowa wycena w 24h." name="description"/>
   <title>GGhaft — Przemysłowy Haft Komputerowy i Druk DTF | Krzyszkowice</title>
   
-  <!-- Font: Figtree (warm, human, modern geometric sans) -->
+  <!-- Lucide Icons & Distinct Typography (Space Grotesk for Headlines, Figtree for Body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
     @layer base {
@@ -18,6 +19,17 @@
         margin: 0; 
         padding: 0; 
         scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Prevent iOS Safari automatic zoom on focus while maintaining 14px on desktop */
+      input, textarea, select {
+        font-size: 16px !important;
+      }
+      @media (min-width: 640px) {
+        input, textarea, select {
+          font-size: 0.875rem !important;
+        }
       }
     }
     
@@ -25,12 +37,70 @@
       transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1), background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
     }
     .tactile-btn:active {
-      transform: scale(0.98) translateY(0.5px);
+      transform: scale(0.97) translateY(0.5px);
     }
 
-    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
       outline: 2px solid #2563eb;
       outline-offset: 2px;
+    }
+
+    /* Safe area for mobile devices with notches / navigation bars */
+    .safe-bottom {
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Micro-Animations & Dynamic Transitions */
+    @keyframes alertEnter {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .animate-alert-enter {
+      animation: alertEnter 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes pricePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    .animate-price-pulse {
+      animation: pricePulse 200ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Hardware-Accelerated Floating Mobile Menu Overlay */
+    #mobile-menu {
+      background-color: #ffffff !important;
+      transform: translate3d(0, -10px, 0);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      will-change: transform, opacity;
+      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), 
+                  opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), 
+                  visibility 220ms;
+    }
+    #mobile-menu.menu-open {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* Accessibility: Respect Reduced Motion Preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 
@@ -62,7 +132,8 @@
           },
           fontFamily: {
             sans: ["'Figtree'", "system-ui", "sans-serif"],
-            headline: ["'Figtree'", "system-ui", "sans-serif"],
+            headline: ["'Space Grotesk'", "system-ui", "sans-serif"],
+            display: ["'Space Grotesk'", "system-ui", "sans-serif"],
             body: ["'Figtree'", "system-ui", "sans-serif"],
             mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
           }
@@ -72,272 +143,341 @@
   </script>
 </head>
 
-<body class="bg-white font-sans text-slate-800 min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900 antialiased">
+<body class="bg-white font-sans text-slate-800 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white antialiased pb-20 sm:pb-0 overflow-x-hidden">
 
-  <!-- Navigation Header -->
-  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
-    <div class="h-20 w-full px-6 lg:px-12 flex items-center justify-between gap-6 max-w-7xl mx-auto">
+  <!-- Navigation Header (Clean, High-Contrast & Mobile Optimized) -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all duration-200">
+    <div class="h-16 sm:h-20 w-full px-3.5 sm:px-6 lg:px-8 xl:px-12 flex items-center justify-between gap-2 sm:gap-4 max-w-7xl mx-auto">
       
       <!-- Brand Logo & Identity -->
-      <a class="flex items-center gap-3 shrink-0 group tactile-btn" href="#" aria-label="GGhaft Strona Główna">
-        <img alt="GGhaft Monogram" class="h-9 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UC2Y7g1SmvQi1pKOXjahbQvFMX6lL2s83XCD_WF9GDCNcA2dmp23RQo1rwuNisvBU9WvInVsFUr0CSXUY86TnOoha1rrHfi0EOMsj6XTCwpHQI1Vyx5vyRsurVZbKeZXx8dBDSTLWzhGIrhlFiFnLN7d7mMGQZpZ--jQf-3m9mqIYcPKQoQuUdY9G1yQWs-dKnl5-33EuY8tRQ_JrvW1te5q2YnTF7qVgRQrEQIRUYeLoX74rJtUlJrcj0"/>
-        <div class="flex flex-col border-l border-slate-200 pl-3">
-          <span class="font-extrabold text-lg tracking-tight text-slate-900 leading-none">GGHAFT</span>
-          <span class="text-xs text-slate-500 mt-1 font-medium">Haft Przemysłowy &amp; Druk DTF</span>
+      <a class="flex items-center gap-2 sm:gap-3 shrink min-w-0 group transition-transform duration-150 active:scale-98" href="#" aria-label="GGhaft Strona Główna">
+        <img alt="GGhaft Logo" class="h-9 sm:h-11 md:h-12 w-auto object-contain shrink-0" src="images/logo-tight.png"/>
+        <div class="flex flex-col border-l border-slate-300 pl-2 sm:pl-3 justify-center min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="font-headline font-extrabold text-lg sm:text-2xl tracking-tight text-slate-900 leading-none">GGHAFT</span>
+            <span class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-600 shrink-0"></span>
+          </div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-600 tracking-wider mt-0.5 sm:mt-1 truncate">Haft &amp; Druk DTF</span>
         </div>
       </a>
 
-      <!-- Navigation Links -->
-      <nav class="hidden xl:flex items-center gap-2 text-sm font-medium text-slate-600" aria-label="Główna nawigacja">
-        <a class="px-3 py-2 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors" href="#uslugi">Technologie &amp; Usługi</a>
-        <a class="px-3 py-2 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors" href="#realizacje">Realizacje</a>
-        <a class="px-3 py-2 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors" href="#kalkulator">Kalkulator Wyceny</a>
-        <a class="px-3 py-2 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors" href="#standard">Standard Jakości</a>
-        <a class="px-3 py-2 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors" href="#kontakt">Pracownia &amp; Kontakt</a>
+      <!-- Navigation Links (Desktop & Tablet Lg, Strict Single Line) -->
+      <nav class="hidden lg:flex items-center gap-1 xl:gap-2 text-[14px] font-semibold text-slate-700 shrink-0" aria-label="Główna nawigacja">
+        <a class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap hover:text-blue-600 hover:bg-slate-100 transition-colors" href="#uslugi">
+          <i data-lucide="layers" class="w-4 h-4 text-slate-500"></i>
+          <span>Technologie &amp; Usługi</span>
+        </a>
+        <a class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap hover:text-blue-600 hover:bg-slate-100 transition-colors" href="#realizacje">
+          <i data-lucide="image" class="w-4 h-4 text-slate-500"></i>
+          <span>Realizacje</span>
+        </a>
+        <a class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap hover:text-blue-600 hover:bg-slate-100 transition-colors" href="#kalkulator">
+          <i data-lucide="calculator" class="w-4 h-4 text-slate-500"></i>
+          <span>Kalkulator</span>
+        </a>
+        <a class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap hover:text-blue-600 hover:bg-slate-100 transition-colors" href="#standard">
+          <i data-lucide="shield-check" class="w-4 h-4 text-slate-500"></i>
+          <span>Jakość</span>
+        </a>
+        <a class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap hover:text-blue-600 hover:bg-slate-100 transition-colors" href="#kontakt">
+          <i data-lucide="map-pin" class="w-4 h-4 text-slate-500"></i>
+          <span>Pracownia &amp; Kontakt</span>
+        </a>
       </nav>
 
-      <!-- Actions & Phone -->
-      <div class="flex items-center gap-3 shrink-0">
-        <a class="hidden sm:inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 px-3.5 py-2 rounded-md text-xs font-semibold tactile-btn" href="tel:+48513770517" aria-label="Zadzwoń do nas: 513 770 517">
-          <span class="material-symbols-outlined text-[16px] text-blue-600">call</span>
+      <!-- Actions & Phone & Mobile Toggle -->
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <a class="hidden sm:inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-300 text-slate-800 px-3.5 py-2.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all shadow-2xs" href="tel:+48513770517" aria-label="Zadzwoń do nas: 513 770 517">
+          <i data-lucide="phone" class="w-3.5 h-3.5 text-blue-600"></i>
           <span>+48 513 770 517</span>
         </a>
-        <a class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 font-semibold text-xs tactile-btn shadow-xs" href="#kalkulator">
-          Wycena w 24h
+        <a class="inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-lg px-3 py-2 sm:px-4.5 sm:py-2.5 font-bold text-xs whitespace-nowrap transition-all shadow-xs" href="#kalkulator">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+          <span>Wycena w 24h</span>
         </a>
+
+        <!-- Mobile Menu Button with comfortable 44px tap target -->
+        <button id="mobile-menu-btn" type="button" class="lg:hidden p-2 sm:p-2.5 rounded-lg text-slate-800 hover:bg-slate-100 transition-colors border border-slate-300 bg-slate-50 min-w-[40px] min-h-[40px] flex items-center justify-center active:bg-slate-200" aria-label="Otwórz menu mobilne" aria-expanded="false">
+          <span id="menu-icon-wrap" class="flex items-center justify-center pointer-events-none">
+            <i data-lucide="menu" class="w-5 h-5 text-slate-800"></i>
+          </span>
+          <span id="close-icon-wrap" class="hidden flex items-center justify-center pointer-events-none">
+            <i data-lucide="x" class="w-5 h-5 text-slate-800"></i>
+          </span>
+        </button>
       </div>
+    </div>
+
+    <!-- Mobile Floating Drawer (Hardware Accelerated & Zero DOM Push) -->
+    <div id="mobile-menu" class="absolute top-full left-0 right-0 w-full lg:hidden border-b border-slate-200 bg-white px-4 py-3 shadow-2xl z-50" aria-hidden="true">
+      <nav class="flex flex-col gap-1 text-sm font-semibold text-slate-800">
+        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#uslugi">
+          <i data-lucide="layers" class="w-4 h-4 text-blue-600 shrink-0"></i>
+          <span>Technologie &amp; Usługi</span>
+        </a>
+        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#realizacje">
+          <i data-lucide="image" class="w-4 h-4 text-blue-600 shrink-0"></i>
+          <span>Realizacje i Galeria</span>
+        </a>
+        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#kalkulator">
+          <i data-lucide="calculator" class="w-4 h-4 text-blue-600 shrink-0"></i>
+          <span>Kalkulator Wyceny</span>
+        </a>
+        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#standard">
+          <i data-lucide="shield-check" class="w-4 h-4 text-blue-600 shrink-0"></i>
+          <span>Standard Jakości</span>
+        </a>
+        <a class="mobile-nav-link flex items-center gap-3 px-3.5 py-3 rounded-lg hover:bg-slate-100 hover:text-blue-600 active:bg-blue-50 transition-colors" href="#kontakt">
+          <i data-lucide="map-pin" class="w-4 h-4 text-blue-600 shrink-0"></i>
+          <span>Pracownia &amp; Kontakt</span>
+        </a>
+        
+        <!-- Mobile Drawer Quick Actions -->
+        <div class="pt-3 mt-2 border-t border-slate-200 grid grid-cols-1 gap-2">
+          <a class="flex items-center justify-center gap-2 w-full bg-slate-900 text-white py-3 rounded-lg text-xs font-bold transition-colors shadow-xs active:scale-[0.98]" href="tel:+48513770517">
+            <i data-lucide="phone" class="w-4 h-4 text-blue-400"></i>
+            <span>Zadzwoń: +48 513 770 517</span>
+          </a>
+          <a class="flex items-center justify-center gap-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 rounded-lg text-xs font-bold transition-colors border border-slate-300" href="mailto:biuro@gghaft.pl">
+            <i data-lucide="mail" class="w-4 h-4 text-blue-600"></i>
+            <span>Napisz: biuro@gghaft.pl</span>
+          </a>
+        </div>
+      </nav>
     </div>
   </header>
 
   <main class="w-full flex-1">
     
-    <!-- HERO SECTION (Editorial Open Layout, zero nested cards) -->
-    <section class="w-full bg-white px-6 lg:px-12 py-16 lg:py-24">
-      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+    <!-- HERO SECTION (Editorial Open Layout, Responsive Typography & Spacing) -->
+    <section class="w-full bg-white px-4 sm:px-6 lg:px-12 py-10 sm:py-16 lg:py-24 border-b border-slate-200">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-center">
         
         <!-- Left Column -->
-        <div class="lg:col-span-7 space-y-8">
-          <div class="space-y-4">
-            <div class="inline-flex items-center gap-2 text-slate-700 text-xs font-medium">
-              <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-              <span>Produkcja haftu i druku odzieży</span>
+        <div class="lg:col-span-7 space-y-6 sm:space-y-8">
+          <div class="space-y-3 sm:space-y-4">
+            <div class="inline-flex items-center gap-2 text-slate-700 text-xs font-medium bg-slate-100/80 px-2.5 py-1 rounded-full sm:bg-transparent sm:p-0">
+              <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+              <span class="truncate">Haft i druk odzieży</span>
               <span class="text-slate-400">/</span>
-              <span class="text-slate-900 font-semibold">Krzyszkowice (Małopolska)</span>
+              <span class="text-slate-900 font-bold truncate">Krzyszkowice k. Krakowa</span>
             </div>
             
-            <h1 class="font-extrabold text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-[1.08]">
+            <h1 class="font-headline font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-950 tracking-tight leading-[1.12] sm:leading-[1.08] break-words">
               Przemysłowy haft komputerowy i precyzyjny druk DTF.
             </h1>
             
-            <p class="text-base sm:text-lg text-slate-600 max-w-2xl font-normal leading-relaxed">
+            <p class="text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl font-normal leading-relaxed">
               Znakujemy odzież firmową, roboczą i reklamową na japońskich maszynach Tajima. Oferujemy haft bezpośredni, naszywki 3D oraz elastyczny nadruk DTF wraz z dostawą tekstyliów dla firm w całej Polsce.
             </p>
           </div>
 
           <!-- Action Buttons -->
-          <div class="space-y-6 pt-2">
-            <div class="flex flex-wrap items-center gap-3">
-              <a class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-3.5 font-semibold text-sm tactile-btn shadow-sm" href="#kalkulator">
-                <span class="material-symbols-outlined text-base">tune</span>
+          <div class="space-y-5 pt-1">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <a class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-3.5 font-bold text-sm tactile-btn shadow-xs text-center" href="#kalkulator">
+                <i data-lucide="calculator" class="w-4 h-4 shrink-0"></i>
                 <span>Wyceń zamówienie w 24h</span>
               </a>
-              <a class="inline-flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-800 rounded-md px-6 py-3.5 font-semibold text-sm tactile-btn" href="tel:+48513770517">
-                <span class="material-symbols-outlined text-base text-blue-600">phone</span>
+              <a class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-6 py-3.5 font-bold text-sm tactile-btn shadow-xs text-center" href="tel:+48513770517">
+                <i data-lucide="phone" class="w-4 h-4 text-blue-400 shrink-0"></i>
                 <span>Zadzwoń: 513 770 517</span>
               </a>
             </div>
 
-            <!-- Micro Feature Item (Flat, clean) -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-slate-100">
+            <!-- Micro Feature Item (Clean Mobile Friendly Card) -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 sm:p-0 bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none border border-slate-200 sm:border-0 sm:border-t sm:border-slate-200 sm:pt-4">
               <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-2xl text-blue-600 shrink-0">verified</span>
+                <i data-lucide="badge-check" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0"></i>
                 <div>
-                  <span class="text-sm font-semibold text-slate-900 block">Darmowa próba przedprodukcyjna</span>
-                  <span class="text-xs text-slate-600">Fizyczny haft próbny na docelowym materiale przed uruchomieniem nakładu.</span>
+                  <span class="text-xs sm:text-sm font-bold text-slate-900 block">Darmowa próba przedprodukcyjna</span>
+                  <span class="text-[11px] sm:text-xs text-slate-600">Fizyczny haft próbny na docelowym materiale przed uruchomieniem nakładu.</span>
                 </div>
               </div>
-              <div class="text-xs font-semibold text-blue-700 whitespace-nowrap">
+              <div class="text-[11px] sm:text-xs font-bold text-blue-700 whitespace-nowrap bg-blue-50 sm:bg-transparent px-2 py-1 sm:p-0 rounded">
                 Próba w cenie zlecenia
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right Column: Machine Visual Showcase (Direct clean image, no box-in-box) -->
-        <div class="lg:col-span-5 space-y-4">
-          <div class="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden shadow-sm">
-            <img alt="Hafciarka przemysłowa Tajima w trakcie pracy" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1V50UuOHtc4oHAciXpFc8scZCwISYQ1-5-OAbesBd_1xvuCUbKv24Sc7T_yZ_zMGHmqH2Y1zRHa0WQs695pOSUePQlL5SW9GvrmtOBbCYE1N_58q08Z3gM9Jny0MXR7t3nN-Inz0UvJPlmE1BnPmiTCWNJuUaWIXz8A-yi6XYljz2NpZGmwGLi6_coYdbezgsa1t6SHVOEBBO7vgzLFNwft8p6JHnEt9oDWBtxTM6t90qO3zOB_O5yS_953"/>
+        <!-- Right Column: Machine Visual Showcase -->
+        <div class="lg:col-span-5 space-y-3">
+          <div class="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-2xs">
+            <img alt="Precyzyjny haft komputerowy na polarze i czapce Nowak Warzywa" class="w-full h-full object-cover" src="images/nowak-polar-haft.jpg" loading="eager"/>
           </div>
-          <div class="flex items-center justify-between text-xs text-slate-600 px-1">
-            <span class="font-bold text-slate-900">Stanowisko Tajima M-Series</span>
-            <span class="text-blue-700 font-semibold">Nici Madeira Polyneon (Oeko-Tex)</span>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-600 px-1 font-medium gap-1">
+            <span class="font-bold text-slate-900">Realizacja: Nowak Warzywa</span>
+            <span class="text-blue-700 font-bold">Nici Madeira Polyneon (Oeko-Tex)</span>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- METRIC TECHNICAL RIBBON -->
-    <section aria-label="Kluczowe parametry produkcyjne" class="w-full bg-slate-50 py-12 px-6 lg:px-12">
-      <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="flex flex-col justify-between">
-          <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Prędkość haftu</span>
-          <div class="mt-2 font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
-            1 200 <span class="text-blue-600 text-base font-medium">SPM</span>
+    <!-- METRIC TECHNICAL RIBBON (High-Contrast Industrial Dark Section) -->
+    <section aria-label="Kluczowe parametry produkcyjne" class="w-full bg-slate-900 text-white py-10 sm:py-14 px-4 sm:px-6 lg:px-12 border-b border-slate-800">
+      <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
+        <div class="flex flex-col justify-between border-l-2 border-blue-500 pl-3 sm:pl-4 lg:pl-5">
+          <span class="text-[11px] sm:text-xs text-blue-400 font-bold tracking-wider">Prędkość haftu</span>
+          <div class="mt-1.5 sm:mt-2 font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+            <span class="metric-counter" data-target="1200" data-format="spaced">1 200</span> <span class="text-blue-400 text-xs sm:text-base font-bold">SPM</span>
           </div>
-          <p class="text-xs text-slate-600 mt-2">Maksymalna prędkość japońskich głowic Tajima.</p>
+          <p class="text-[11px] sm:text-xs text-slate-300 mt-1.5 font-normal">Głowice japońskie Tajima.</p>
         </div>
-        <div class="flex flex-col justify-between">
-          <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Wielkość serii</span>
-          <div class="mt-2 font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
-            1 — 10 000
+        <div class="flex flex-col justify-between border-l-2 border-slate-700 pl-3 sm:pl-4 lg:pl-5">
+          <span class="text-[11px] sm:text-xs text-blue-400 font-bold tracking-wider">Wielkość serii</span>
+          <div class="mt-1.5 sm:mt-2 font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+            1 — 10k
           </div>
-          <p class="text-xs text-slate-600 mt-2">Elastyczny nakład: od pojedynczego wzoru po hurt B2B.</p>
+          <p class="text-[11px] sm:text-xs text-slate-300 mt-1.5 font-normal">Pojedynczy wzór po hurt B2B.</p>
         </div>
-        <div class="flex flex-col justify-between">
-          <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Odporność na pranie</span>
-          <div class="mt-2 font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
-            95°C <span class="text-emerald-700 text-base font-medium">MAX</span>
+        <div class="flex flex-col justify-between border-l-2 border-emerald-500 pl-3 sm:pl-4 lg:pl-5">
+          <span class="text-[11px] sm:text-xs text-emerald-400 font-bold tracking-wider">Odporność prania</span>
+          <div class="mt-1.5 sm:mt-2 font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+            <span class="metric-counter" data-target="95">95</span>°C <span class="text-emerald-400 text-xs sm:text-base font-bold">MAX</span>
           </div>
-          <p class="text-xs text-slate-600 mt-2">Odporność na pranie przemysłowe odzieży roboczej i BHP.</p>
+          <p class="text-[11px] sm:text-xs text-slate-300 mt-1.5 font-normal">Pranie przemysłowe odzieży BHP.</p>
         </div>
-        <div class="flex flex-col justify-between">
-          <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Czas wyceny</span>
-          <div class="mt-2 font-extrabold text-3xl sm:text-blue-600 tracking-tight">
-            &lt; 24h
+        <div class="flex flex-col justify-between border-l-2 border-blue-400 pl-3 sm:pl-4 lg:pl-5">
+          <span class="text-[11px] sm:text-xs text-blue-400 font-bold tracking-wider">Czas wyceny</span>
+          <div class="mt-1.5 sm:mt-2 font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-blue-400 tracking-tight">
+            &lt; <span class="metric-counter" data-target="24">24</span>h
           </div>
-          <p class="text-xs text-slate-600 mt-2">Gwarantowany czas przygotowania kosztorysu.</p>
+          <p class="text-[11px] sm:text-xs text-slate-300 mt-1.5 font-normal">Gwarantowany kosztorys.</p>
         </div>
       </div>
     </section>
 
-    <!-- 3 SERVICE COLUMNS (Clean Editorial Layout, zero nested boxes) -->
-    <section class="w-full bg-white px-6 lg:px-12 py-20 lg:py-28" id="uslugi">
+    <!-- 3 SERVICE COLUMNS (Clean Editorial Layout, Zero Nested Cards) -->
+    <section class="w-full bg-slate-100/70 px-4 sm:px-6 lg:px-12 py-12 sm:py-20 lg:py-28 border-b border-slate-200 scroll-mt-16 sm:scroll-mt-20" id="uslugi">
       <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 pb-6 border-b border-slate-100">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6 pb-6 border-b border-slate-300">
           <div>
-            <span class="text-xs font-bold text-blue-600 uppercase block mb-1">Oferta produkcyjna</span>
-            <h2 class="font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
+            <span class="text-xs font-bold text-blue-600 block mb-1 tracking-wider">
+              Oferta produkcyjna
+            </span>
+            <h2 class="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-slate-950 tracking-tight">
               Metody Znakowania &amp; Dostawa Odzieży
             </h2>
           </div>
-          <p class="text-sm text-slate-600 max-w-md">
+          <p class="text-xs sm:text-sm text-slate-600 max-w-md font-medium">
             Dobieramy optymalną technologię pod gramaturę tkaniny i docelowe warunki użytkowania odzieży.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
           
           <!-- Column 1: Haft -->
-          <div class="space-y-6 flex flex-col justify-between">
+          <div class="group space-y-5 flex flex-col justify-between bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
             <div class="space-y-4">
-              <div class="aspect-[16/10] w-full bg-slate-100 rounded-xl overflow-hidden shadow-xs">
-                <img alt="Haft Komputerowy Tajima" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1V50UuOHtc4oHAciXpFc8scZCwISYQ1-5-OAbesBd_1xvuCUbKv24Sc7T_yZ_zMGHmqH2Y1zRHa0WQs695pOSUePQlL5SW9GvrmtOBbCYE1N_58q08Z3gM9Jny0MXR7t3nN-Inz0UvJPlmE1BnPmiTCWNJuUaWIXz8A-yi6XYljz2NpZGmwGLi6_coYdbezgsa1t6SHVOEBBO7vgzLFNwft8p6JHnEt9oDWBtxTM6t90qO3zOB_O5yS_953"/>
+              <div class="aspect-[16/10] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+                <img alt="Haft Komputerowy na czapkach i odzieży" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/nowak-warzywa-czapki.jpg" loading="lazy"/>
               </div>
               <div>
-                <div class="text-xs text-blue-700 font-bold uppercase mb-1">
+                <div class="text-xs text-blue-700 font-bold mb-1">
                   Do 15 kolorów nici
                 </div>
-                <h3 class="font-bold text-xl text-slate-900 mb-2">Haft Komputerowy &amp; Naszywki 3D</h3>
-                <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                <h3 class="font-bold text-lg sm:text-xl text-slate-900 mb-2">Haft Komputerowy &amp; Naszywki 3D</h3>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Najwyższa trwałość i elegancki wygląd. Bezpośrednie wyszywanie na odzieży lub precyzyjne emblematy z obszyciem owerlokowym i rzepem.
                 </p>
-                <div class="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700 font-medium">
+                <div class="space-y-2.5 pt-3 border-t border-slate-200 text-xs text-slate-700 font-medium">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Polary, softshelle, kurtki zimowe</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Czapki z daszkiem (konstrukcja 3D)</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Naszywki mundurowe i firmowe</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <a class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-bold tactile-btn" href="#kalkulator">
-                <span>Wyceń haft</span>
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            <div class="pt-4 border-t border-slate-200">
+              <a class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-xs sm:text-sm font-bold tactile-btn group py-1" href="#kalkulator">
+                <span>Wyceń haft komputerowy</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5"></i>
               </a>
             </div>
           </div>
 
           <!-- Column 2: Druk DTF -->
-          <div class="space-y-6 flex flex-col justify-between">
+          <div class="group space-y-5 flex flex-col justify-between bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
             <div class="space-y-4">
-              <div class="aspect-[16/10] w-full bg-slate-100 rounded-xl overflow-hidden shadow-xs">
-                <img alt="Druk Cyfrowy DTF na odzieży" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XKvUBauTotgBYJbt9kXkqHy6hJGrc0IGgQ1DRDpw6Pgpdt24kVVN-0GVP1DjvCqzD5RchN7_s1n5yp5SsvT9QHhJkHvH15_-LHR9WbUKO1-nYqoDniKhstoaoV31OpXyLAY3FZUnE8zf-jplQFOypQGCEW0RpjhUnUDpEaDq06Rfi3zU-DN6xpkGuW02SHIkiBkPreoF53HODvj4V5wV92SRQIqpvdbFQ4bl9chBClLR7PhbQNbqup4-M"/>
+              <div class="aspect-[16/10] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+                <img alt="Druk Cyfrowy DTF na koszulkach roboczych" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/stalcore-workwear.jpg" loading="lazy"/>
               </div>
               <div>
-                <div class="text-xs text-blue-700 font-bold uppercase mb-1">
+                <div class="text-xs text-blue-700 font-bold mb-1">
                   Pełna paleta CMYK + White
                 </div>
-                <h3 class="font-bold text-xl text-slate-900 mb-2">Druk Cyfrowy DTF &amp; Sitodruk</h3>
-                <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                <h3 class="font-bold text-lg sm:text-xl text-slate-900 mb-2">Druk Cyfrowy DTF &amp; Sitodruk</h3>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Precyzyjne odwzorowanie detali, gradientów i drobnych napisów. Elastyczny nadruk odporny na pękanie o przyjemnym w dotyku wykończeniu.
                 </p>
-                <div class="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700 font-medium">
+                <div class="space-y-2.5 pt-3 border-t border-slate-200 text-xs text-slate-700 font-medium">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Koszulki bawełniane i odzież streetwear</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Bluzy z kapturem (hoodies)</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Torby bawełniane i odzież sportowa</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <a class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-bold tactile-btn" href="#kalkulator">
-                <span>Wyceń druk DTF</span>
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            <div class="pt-4 border-t border-slate-200">
+              <a class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-xs sm:text-sm font-bold tactile-btn group py-1" href="#kalkulator">
+                <span>Wyceń druk cyfrowy DTF</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5"></i>
               </a>
             </div>
           </div>
 
           <!-- Column 3: Tekstylia B2B -->
-          <div class="space-y-6 flex flex-col justify-between">
+          <div class="group space-y-5 flex flex-col justify-between bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
             <div class="space-y-4">
-              <div class="aspect-[16/10] w-full bg-slate-100 rounded-xl overflow-hidden shadow-xs">
-                <img alt="Odzież firmowa i katalogi hurtowe" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1U9g0Wh0uDd4MkjwdRm8KVNZ58a6epvyq7_RxiY-KZN6phJKdF8edopS1xTxu3Ml9aCKzL5mwEhniW8vUD5utteP3_jzBDhUof1Ky_6FqOtvMctwtI0ww1jDbfsHk-BaxTSOoILh6B3hyRwff9FS4ygdZ9mMUmdKGZlR11KuEe766T4dCXmuEzO0EKUeK9cvrYUJYYzCnSX6xvk9oL_mpxzrHIuzjNPtI6OJShF3umQ9-EvlNouFGpfwGGK"/>
+              <div class="aspect-[16/10] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+                <img alt="Odzież firmowa i dostawa hurtowa" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/budeobud-odziez-robocza.jpg" loading="lazy"/>
               </div>
               <div>
-                <div class="text-xs text-blue-700 font-bold uppercase mb-1">
+                <div class="text-xs text-blue-700 font-bold mb-1">
                   Dostawa z hurtowni B2B
                 </div>
-                <h3 class="font-bold text-xl text-slate-900 mb-2">Dostawa Odzieży &amp; Znakowanie</h3>
-                <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                <h3 class="font-bold text-lg sm:text-xl text-slate-900 mb-2">Dostawa Odzieży &amp; Znakowanie</h3>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Dostarczamy gotową odzież bezpośrednio od dystrybutorów: Malfini, Promostars, JHK, Portwest i Stedman w cenach hurtowych.
                 </p>
-                <div class="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700 font-medium">
+                <div class="space-y-2.5 pt-3 border-t border-slate-200 text-xs text-slate-700 font-medium">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Preferencyjne ceny hurtowe na odzież</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Pojedyncze pakowanie w woreczki (polybag)</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">check</span>
+                    <i data-lucide="check" class="w-4 h-4 text-blue-600 shrink-0"></i>
                     <span>Metkowanie i personalizacja imienna</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <a class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-bold tactile-btn" href="#kalkulator">
+            <div class="pt-4 border-t border-slate-200">
+              <a class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-xs sm:text-sm font-bold tactile-btn group py-1" href="#kalkulator">
                 <span>Zapytaj o katalog odzieży</span>
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5"></i>
               </a>
             </div>
           </div>
@@ -346,209 +486,88 @@
       </div>
     </section>
 
-    <!-- CONFIGURATOR / QUOTE FORM (Flat, direct surface, no nested card wrappers) -->
-    <section class="w-full bg-slate-50 px-6 lg:px-12 py-20 lg:py-28" id="kalkulator">
-      <div class="max-w-3xl mx-auto">
-        <div class="text-center max-w-xl mx-auto mb-12">
-          <span class="text-xs font-bold text-blue-600 uppercase">Szybka wycena</span>
-          <h2 class="font-extrabold text-3xl text-slate-900 tracking-tight mt-1">Skonfiguruj Zapytanie</h2>
-          <p class="text-sm text-slate-600 mt-2">Wypełnij formularz zlecenia. Otrzymasz szczegółowy kosztorys w ciągu 24 godzin.</p>
-        </div>
-
-        <form class="space-y-8" onsubmit="event.preventDefault(); document.getElementById('form-feedback').classList.remove('hidden');">
-          
-          <!-- Step 1: Technika -->
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">1</span>
-              <span class="text-sm font-bold text-slate-800">Wybór technologii znakowania</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label class="cursor-pointer border border-slate-300 rounded-lg p-4 flex flex-col justify-between bg-white hover:border-slate-400 transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/40">
-                <input checked="" class="sr-only" name="technique" type="radio" value="haft"/>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="font-bold text-sm text-slate-900">Haft Komputerowy</span>
-                  <span class="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center text-blue-600 text-xs">●</span>
-                </div>
-                <span class="text-xs text-slate-600">Polary, czapki, kurtki, odzież firmowa i BHP.</span>
-              </label>
-              <label class="cursor-pointer border border-slate-300 rounded-lg p-4 flex flex-col justify-between bg-white hover:border-slate-400 transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/40">
-                <input class="sr-only" name="technique" type="radio" value="dtf"/>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="font-bold text-sm text-slate-900">Druk Cyfrowy DTF</span>
-                  <span class="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center text-blue-600 text-xs">●</span>
-                </div>
-                <span class="text-xs text-slate-600">Wielobarwne grafiki, zdjęcia, t-shirty, bluzy.</span>
-              </label>
-              <label class="cursor-pointer border border-slate-300 rounded-lg p-4 flex flex-col justify-between bg-white hover:border-slate-400 transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/40">
-                <input class="sr-only" name="technique" type="radio" value="doradztwo"/>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="font-bold text-sm text-slate-900">Doradztwo Technologa</span>
-                  <span class="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center text-blue-600 text-xs">●</span>
-                </div>
-                <span class="text-xs text-slate-600">Dobierzemy optymalną metodę po analizie grafiki.</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Step 2: Asortyment i Nakład -->
-          <div class="space-y-4 pt-4 border-t border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">2</span>
-              <span class="text-sm font-bold text-slate-800">Asortyment &amp; szacowany nakład</span>
-            </div>
-            
-            <!-- Product Pills -->
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-semibold transition-colors has-[:checked]:bg-slate-900 has-[:checked]:text-white has-[:checked]:border-slate-900">
-                <input checked="" class="sr-only" name="product" type="checkbox" value="tshirt"/>
-                T-Shirty / Polo
-              </label>
-              <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-semibold transition-colors has-[:checked]:bg-slate-900 has-[:checked]:text-white has-[:checked]:border-slate-900">
-                <input checked="" class="sr-only" name="product" type="checkbox" value="hoodie"/>
-                Bluzy / Hoodies
-              </label>
-              <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-semibold transition-colors has-[:checked]:bg-slate-900 has-[:checked]:text-white has-[:checked]:border-slate-900">
-                <input class="sr-only" name="product" type="checkbox" value="polar"/>
-                Softshell / Polary
-              </label>
-              <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-semibold transition-colors has-[:checked]:bg-slate-900 has-[:checked]:text-white has-[:checked]:border-slate-900">
-                <input class="sr-only" name="product" type="checkbox" value="caps"/>
-                Czapki (3D / Płaskie)
-              </label>
-              <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-semibold transition-colors has-[:checked]:bg-slate-900 has-[:checked]:text-white has-[:checked]:border-slate-900">
-                <input class="sr-only" name="product" type="checkbox" value="bhp"/>
-                Odzież Robocza
-              </label>
-            </div>
-
-            <!-- Quantity control -->
-            <div class="pt-2">
-              <span class="text-xs text-slate-700 block mb-2 font-bold">Szacunkowa liczba sztuk:</span>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-medium transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                  <input class="sr-only" name="qty" type="radio" value="sample"/>
-                  1 — 9 szt. (Próba)
-                </label>
-                <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-medium transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                  <input checked="" class="sr-only" name="qty" type="radio" value="small"/>
-                  10 — 49 szt.
-                </label>
-                <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-medium transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                  <input class="sr-only" name="qty" type="radio" value="medium"/>
-                  50 — 199 szt.
-                </label>
-                <label class="border border-slate-300 bg-white rounded-md py-2.5 px-3 text-center cursor-pointer text-xs font-medium transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                  <input class="sr-only" name="qty" type="radio" value="large"/>
-                  200+ szt. (Hurt B2B)
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 3: Projekt & Dane -->
-          <div class="space-y-4 pt-4 border-t border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">3</span>
-              <span class="text-sm font-bold text-slate-800">Projekt graficzny &amp; dane kontaktowe</span>
-            </div>
-            
-            <!-- Upload Drop Area (Seamless flat surface) -->
-            <div class="rounded-lg bg-white p-6 text-center cursor-pointer hover:bg-slate-100/70 transition-colors shadow-xs" onclick="document.getElementById('file-input').click()">
-              <input class="hidden" id="file-input" type="file"/>
-              <span class="material-symbols-outlined text-3xl text-blue-600 mb-1">upload_file</span>
-              <div class="text-sm font-semibold text-slate-800">Przeciągnij plik z projektem lub kliknij, aby wybrać</div>
-              <div class="text-xs text-slate-500 mt-1">Formaty: PDF, AI, CDR, SVG, EPS lub PNG min. 300 DPI</div>
-            </div>
-
-            <!-- Form Inputs -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Numer telefonu *</label>
-                <input class="w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="+48 000 000 000" required="" type="tel"/>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Adres e-mail *</label>
-                <input class="w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="twoja@firma.pl" required="" type="email"/>
-              </div>
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Opis zlecenia (rozmiar w cm, umiejscowienie haftu/druku, odzież własna czy z katalogu)</label>
-                <textarea class="w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Np. Haft na lewej piersi 9 cm + druk DTF na plecach, 40 sztuk czarnych bluz..." rows="3"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- Submit button -->
-          <button class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md py-4 px-6 font-semibold text-sm flex items-center justify-center gap-2 tactile-btn shadow-sm" type="submit">
-            <span class="material-symbols-outlined text-base">send</span>
-            <span>Wyślij zapytanie o wycenę</span>
-          </button>
-
-          <!-- Success notification -->
-          <div class="hidden rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-center text-sm font-medium text-emerald-900" id="form-feedback">
-            ✓ Dziękujemy! Otrzymaliśmy Twoje zapytanie. Odpowiemy ze szczegółową wyceną w ciągu 24 godzin.
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- 4-STEP QUALITY PROCESS (Clean, open pipeline) -->
-    <section class="w-full bg-white px-6 lg:px-12 py-20 lg:py-28" id="standard">
+    <!-- 4-STEP QUALITY PROCESS (Clean Section with Responsive Grid) -->
+    <section class="w-full bg-white px-4 sm:px-6 lg:px-12 py-12 sm:py-20 lg:py-28 border-b border-slate-200 scroll-mt-16 sm:scroll-mt-20" id="standard">
       <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 pb-6 border-b border-slate-100">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6 pb-6 border-b border-slate-200">
           <div>
-            <span class="text-xs font-bold text-blue-600 uppercase block mb-1">Standard GGhaft</span>
-            <h2 class="font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
+            <span class="text-xs font-bold text-blue-600 block mb-1 tracking-wider">
+              Standard GGhaft
+            </span>
+            <h2 class="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-slate-950 tracking-tight">
               4-Etapowy Proces Realizacji
             </h2>
           </div>
-          <p class="text-sm text-slate-600 max-w-md">
+          <p class="text-xs sm:text-sm text-slate-600 max-w-md font-medium">
             Każde zamówienie realizujemy z zachowaniem rygorystycznej kontroli jakości i obowiązkową próbą przedprodukcyjną.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           
-          <div class="space-y-3">
-            <span class="text-blue-600 font-extrabold text-3xl tracking-tight block">01</span>
+          <div class="relative space-y-3 p-4 sm:p-0 bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none border border-slate-200 sm:border-0">
+            <div class="flex items-center justify-between">
+              <span class="font-headline font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight block">01</span>
+              <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                <i data-lucide="arrow-right" class="w-4 h-4 hidden lg:block"></i>
+                <i data-lucide="arrow-down" class="w-4 h-4 lg:hidden"></i>
+              </div>
+            </div>
             <h3 class="font-bold text-base text-slate-900">Programowanie CAD</h3>
             <p class="text-xs text-slate-600 leading-relaxed">
               Opracowujemy wzór w programie Wilcom, dobierając odpowiednią gęstość i kierunki ściegów pod Twój materiał.
             </p>
-            <div class="text-xs font-semibold text-slate-500 pt-2">
+            <div class="text-[11px] sm:text-xs font-semibold text-slate-500 pt-2 border-t border-slate-200 sm:border-0">
               Oprogramowanie Wilcom CAD
             </div>
           </div>
 
-          <div class="space-y-3">
-            <span class="text-blue-600 font-extrabold text-3xl tracking-tight block">02</span>
+          <div class="relative space-y-3 p-4 sm:p-0 bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none border border-slate-200 sm:border-0">
+            <div class="flex items-center justify-between">
+              <span class="font-headline font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight block">02</span>
+              <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                <i data-lucide="arrow-right" class="w-4 h-4 hidden lg:block"></i>
+                <i data-lucide="arrow-down" class="w-4 h-4 lg:hidden"></i>
+              </div>
+            </div>
             <h3 class="font-bold text-base text-slate-900">Próba Przedprodukcyjna</h3>
             <p class="text-xs text-slate-600 leading-relaxed">
               Wykonujemy fizyczny haft próbny na docelowym skrawku tkaniny i przesyłamy zdjęcie do Twojej akceptacji.
             </p>
-            <div class="text-xs font-semibold text-slate-500 pt-2">
+            <div class="text-[11px] sm:text-xs font-semibold text-slate-500 pt-2 border-t border-slate-200 sm:border-0">
               Zdjęcie próbki do akceptacji
             </div>
           </div>
 
-          <div class="space-y-3">
-            <span class="text-blue-600 font-extrabold text-3xl tracking-tight block">03</span>
+          <div class="relative space-y-3 p-4 sm:p-0 bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none border border-slate-200 sm:border-0">
+            <div class="flex items-center justify-between">
+              <span class="font-headline font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight block">03</span>
+              <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                <i data-lucide="arrow-right" class="w-4 h-4 hidden lg:block"></i>
+                <i data-lucide="arrow-down" class="w-4 h-4 lg:hidden"></i>
+              </div>
+            </div>
             <h3 class="font-bold text-base text-slate-900">Produkcja Tajima</h3>
             <p class="text-xs text-slate-600 leading-relaxed">
               Haftujemy na maszynach Tajima z cyfrowym naciągiem, używając certyfikowanych nici Madeira Polyneon.
             </p>
-            <div class="text-xs font-semibold text-slate-500 pt-2">
+            <div class="text-[11px] sm:text-xs font-semibold text-slate-500 pt-2 border-t border-slate-200 sm:border-0">
               Nici z atestem Oeko-Tex
             </div>
           </div>
 
-          <div class="space-y-3">
-            <span class="text-blue-600 font-extrabold text-3xl tracking-tight block">04</span>
+          <div class="relative space-y-3 p-4 sm:p-0 bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none border border-slate-200 sm:border-0">
+            <div class="flex items-center justify-between">
+              <span class="font-headline font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight block">04</span>
+              <div class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                <i data-lucide="check" class="w-4 h-4"></i>
+              </div>
+            </div>
             <h3 class="font-bold text-base text-slate-900">Obróbka &amp; Pakowanie</h3>
             <p class="text-xs text-slate-600 leading-relaxed">
               Ręcznie czyścimy nitki, usuwamy podkłady fizelinowe, prasujemy parowo i sortujemy odzież w kartony.
             </p>
-            <div class="text-xs font-semibold text-slate-500 pt-2">
+            <div class="text-[11px] sm:text-xs font-semibold text-slate-500 pt-2 border-t border-slate-200 sm:border-0">
               Gotowe do natychmiastowego wydania
             </div>
           </div>
@@ -557,71 +576,404 @@
       </div>
     </section>
 
-    <!-- RECENT REALIZATIONS SHOWROOM (Open gallery lookbook) -->
-    <section class="w-full bg-slate-50 px-6 lg:px-12 py-20 lg:py-28" id="realizacje">
+    <!-- CALCULATOR & CONFIGURATOR (Touch-Friendly Responsive Layout) -->
+    <section class="w-full bg-slate-900 text-white px-4 sm:px-6 lg:px-12 py-12 sm:py-20 lg:py-28 border-b border-slate-800 scroll-mt-16 sm:scroll-mt-20" id="kalkulator">
       <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 pb-6 border-b border-slate-200">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-14 gap-4 sm:gap-6 pb-6 border-b border-slate-800">
           <div>
-            <span class="text-xs font-bold text-blue-600 uppercase block mb-1">Portfolio</span>
-            <h2 class="font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
+            <span class="text-xs font-bold text-blue-400 tracking-wider block mb-1">
+              Konfigurator &amp; wycena zlecenia
+            </span>
+            <h2 class="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+              Oblicz Szacunkowy Koszt i Zamów Próbę
+            </h2>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-md font-medium">
+            Skonfiguruj parametry nakładu poniżej. Otrzymasz natychmiastowy szacunek oraz dokładną kalkulację od technologa w 24h.
+          </p>
+        </div>
+
+        <form id="quote-calculator-form" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start" onsubmit="event.preventDefault(); const fb = document.getElementById('calc-form-feedback'); if(fb){ fb.classList.remove('hidden'); fb.classList.remove('animate-alert-enter'); void fb.offsetWidth; fb.classList.add('animate-alert-enter'); }">
+          
+          <!-- Left Column: Interactive Configuration Options (7 Cols) -->
+          <div class="lg:col-span-7 space-y-6 sm:space-y-8">
+            
+            <!-- Step 1: Technologia Znakowania -->
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                <span class="text-xs sm:text-sm font-bold text-white tracking-wide">Wybór technologii znakowania</span>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                <label class="cursor-pointer border border-slate-700 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between bg-slate-800/80 hover:border-slate-500 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/40 active:scale-[0.99]">
+                  <input checked="" class="sr-only calc-input" name="technique" type="radio" value="haft" data-base="11.50"/>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-white">Haft Tajima</span>
+                    <i data-lucide="needle" class="w-4 h-4 text-blue-400"></i>
+                  </div>
+                  <span class="text-[11px] sm:text-xs text-slate-400">Polary, softshell, czapki, wysoka trwałość do 95°C.</span>
+                </label>
+
+                <label class="cursor-pointer border border-slate-700 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between bg-slate-800/80 hover:border-slate-500 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/40 active:scale-[0.99]">
+                  <input class="sr-only calc-input" name="technique" type="radio" value="dtf" data-base="9.50"/>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-white">Druk DTF</span>
+                    <i data-lucide="printer" class="w-4 h-4 text-blue-400"></i>
+                  </div>
+                  <span class="text-[11px] sm:text-xs text-slate-400">T-shirty, bluzy, pełen kolor CMYK, elastyczny nadruk.</span>
+                </label>
+
+                <label class="cursor-pointer border border-slate-700 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between bg-slate-800/80 hover:border-slate-500 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/40 active:scale-[0.99]">
+                  <input class="sr-only calc-input" name="technique" type="radio" value="doradztwo" data-base="10.50"/>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-white">Doradztwo</span>
+                    <i data-lucide="help-circle" class="w-4 h-4 text-blue-400"></i>
+                  </div>
+                  <span class="text-[11px] sm:text-xs text-slate-400">Dobór metody po bezpłatnej analizie pliku graficznego.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 2: Źródło Odzieży i Asortyment -->
+            <div class="space-y-4 pt-5 sm:pt-6 border-t border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                <span class="text-xs sm:text-sm font-bold text-white tracking-wide">Źródło odzieży i rodzaj produktu</span>
+              </div>
+              
+              <!-- Source selector -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                <label class="border border-slate-700 bg-slate-800 text-slate-200 rounded-xl p-3 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white has-[:checked]:border-blue-500 flex items-center justify-center gap-2 min-h-[44px]">
+                  <input checked="" class="sr-only calc-input" name="apparel_source" type="radio" value="catalog"/>
+                  <i data-lucide="shopping-bag" class="w-4 h-4 shrink-0"></i>
+                  <span>Dostawa odzieży z hurtowni GGhaft</span>
+                </label>
+                <label class="border border-slate-700 bg-slate-800 text-slate-200 rounded-xl p-3 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white has-[:checked]:border-blue-500 flex items-center justify-center gap-2 min-h-[44px]">
+                  <input class="sr-only calc-input" name="apparel_source" type="radio" value="own"/>
+                  <i data-lucide="package-check" class="w-4 h-4 shrink-0"></i>
+                  <span>Dostarczam własną odzież</span>
+                </label>
+              </div>
+
+              <!-- Apparel Categories -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1">
+                <label class="border border-slate-700 bg-slate-800/90 text-slate-300 rounded-lg py-2.5 px-2 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-slate-700 has-[:checked]:text-white has-[:checked]:border-slate-400 min-h-[40px] flex items-center justify-center">
+                  <input checked="" class="sr-only calc-input" name="product_type" type="checkbox" value="T-Shirty / Polo"/>
+                  <span>T-Shirty / Polo</span>
+                </label>
+                <label class="border border-slate-700 bg-slate-800/90 text-slate-300 rounded-lg py-2.5 px-2 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-slate-700 has-[:checked]:text-white has-[:checked]:border-slate-400 min-h-[40px] flex items-center justify-center">
+                  <input checked="" class="sr-only calc-input" name="product_type" type="checkbox" value="Bluzy / Hoodies"/>
+                  <span>Bluzy / Hoodies</span>
+                </label>
+                <label class="border border-slate-700 bg-slate-800/90 text-slate-300 rounded-lg py-2.5 px-2 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-slate-700 has-[:checked]:text-white has-[:checked]:border-slate-400 min-h-[40px] flex items-center justify-center">
+                  <input class="sr-only calc-input" name="product_type" type="checkbox" value="Softshell / Polary"/>
+                  <span>Polary / Kurtki</span>
+                </label>
+                <label class="border border-slate-700 bg-slate-800/90 text-slate-300 rounded-lg py-2.5 px-2 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-slate-700 has-[:checked]:text-white has-[:checked]:border-slate-400 min-h-[40px] flex items-center justify-center">
+                  <input class="sr-only calc-input" name="product_type" type="checkbox" value="Czapki (3D / Płaskie)"/>
+                  <span>Czapki z daszkiem</span>
+                </label>
+                <label class="col-span-2 sm:col-span-1 border border-slate-700 bg-slate-800/90 text-slate-300 rounded-lg py-2.5 px-2 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:bg-slate-700 has-[:checked]:text-white has-[:checked]:border-slate-400 min-h-[40px] flex items-center justify-center">
+                  <input class="sr-only calc-input" name="product_type" type="checkbox" value="Odzież Robocza BHP"/>
+                  <span>Odzież BHP</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 3: Rozmiar & Pozycja Znakowania -->
+            <div class="space-y-3 pt-5 sm:pt-6 border-t border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                <span class="text-xs sm:text-sm font-bold text-white tracking-wide">Rozmiar i umiejscowienie znakowania</span>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                <label class="cursor-pointer border border-slate-700 rounded-xl p-3.5 flex flex-col justify-between bg-slate-800 hover:border-slate-500 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/40 active:scale-[0.99]">
+                  <input checked="" class="sr-only calc-input" name="placement" type="radio" value="small" data-multiplier="1.0"/>
+                  <div class="font-bold text-sm text-white mb-1">Pierś / Rękaw / Czapka</div>
+                  <span class="text-[11px] sm:text-xs text-slate-400">Format do 10 × 10 cm (standardowe logo dyskretne)</span>
+                </label>
+
+                <label class="cursor-pointer border border-slate-700 rounded-xl p-3.5 flex flex-col justify-between bg-slate-800 hover:border-slate-500 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/40 active:scale-[0.99]">
+                  <input class="sr-only calc-input" name="placement" type="radio" value="large" data-multiplier="1.35"/>
+                  <div class="font-bold text-sm text-white mb-1">Plecy / Duży Format</div>
+                  <span class="text-[11px] sm:text-xs text-slate-400">Format do 28 × 25 cm (duży branding z daleka)</span>
+                </label>
+
+                <label class="cursor-pointer border border-slate-700 rounded-xl p-3.5 flex flex-col justify-between bg-slate-800 hover:border-slate-500 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/40 active:scale-[0.99]">
+                  <input class="sr-only calc-input" name="placement" type="radio" value="double" data-multiplier="1.65"/>
+                  <div class="font-bold text-sm text-white mb-1">2 Miejsca (Pierś + Plecy)</div>
+                  <span class="text-[11px] sm:text-xs text-slate-400">Kompletny branding przód + tył na jednym ubraniu</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 4: Nakład (Ilość Sztuk) -->
+            <div class="space-y-3 pt-5 sm:pt-6 border-t border-slate-800">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">4</span>
+                  <span class="text-xs sm:text-sm font-bold text-white tracking-wide">Szacowany nakład sztuk</span>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                  <span class="text-xs text-slate-400">Wpisz liczbę:</span>
+                  <input id="custom-qty-input" type="number" min="1" max="10000" value="30" class="w-20 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-sm font-bold text-white text-center focus:border-blue-500 focus:outline-none"/>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                <label class="border border-slate-700 bg-slate-800 text-slate-300 rounded-xl py-3 px-2 sm:px-3 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white active:scale-[0.98]">
+                  <input class="sr-only calc-input" name="qty_tier" type="radio" value="1-9" data-qty-val="5" data-tier-mult="1.55"/>
+                  <div class="font-bold">1 — 9 szt.</div>
+                  <span class="text-[10px] sm:text-xs opacity-80 block mt-0.5 truncate">Próba / Mały nakład</span>
+                </label>
+
+                <label class="border border-slate-700 bg-slate-800 text-slate-300 rounded-xl py-3 px-2 sm:px-3 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white active:scale-[0.98]">
+                  <input checked="" class="sr-only calc-input" name="qty_tier" type="radio" value="10-49" data-qty-val="30" data-tier-mult="1.0"/>
+                  <div class="font-bold">10 — 49 szt.</div>
+                  <span class="text-[10px] sm:text-xs opacity-80 block mt-0.5 truncate">Średnia seria</span>
+                </label>
+
+                <label class="border border-slate-700 bg-slate-800 text-slate-300 rounded-xl py-3 px-2 sm:px-3 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white active:scale-[0.98]">
+                  <input class="sr-only calc-input" name="qty_tier" type="radio" value="50-199" data-qty-val="100" data-tier-mult="0.75"/>
+                  <div class="font-bold">50 — 199 szt.</div>
+                  <span class="text-[10px] sm:text-xs opacity-80 block mt-0.5 truncate">Optymalna B2B</span>
+                </label>
+
+                <label class="border border-slate-700 bg-slate-800 text-slate-300 rounded-xl py-3 px-2 sm:px-3 text-center cursor-pointer text-xs font-semibold transition-colors hover:border-slate-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white active:scale-[0.98]">
+                  <input class="sr-only calc-input" name="qty_tier" type="radio" value="200+" data-qty-val="250" data-tier-mult="0.55"/>
+                  <div class="font-bold">200+ szt.</div>
+                  <span class="text-[10px] sm:text-xs opacity-80 block mt-0.5 truncate">Hurt przemysłowy</span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Live Summary Widget & Form Submission -->
+          <div class="lg:col-span-5 space-y-6 bg-slate-800/40 p-4 sm:p-6 rounded-2xl border border-slate-800">
+            
+            <!-- Dynamic Calculation Header & Metric Bar -->
+            <div class="space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold text-slate-400 tracking-wider">Szacunek zlecenia na żywo</span>
+                <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                  Wycena 24h
+                </span>
+              </div>
+
+              <!-- Price Display -->
+              <div>
+                <span class="text-xs text-slate-400 block mb-1">Szacunkowy koszt znakowania:</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-xs text-slate-400 font-medium">od</span>
+                  <span id="live-calc-price" class="font-black text-3xl sm:text-4xl text-blue-400 tracking-tight font-sans inline-block transition-transform">11,50 zł</span>
+                  <span class="text-xs text-slate-300 font-medium">netto / szt.</span>
+                </div>
+                <p class="text-[11px] sm:text-xs text-slate-400 mt-1 max-w-sm">Ostateczna cena zależy od gęstości ściegów lub powierzchni nadruku.</p>
+              </div>
+
+              <!-- Production Highlights -->
+              <div class="space-y-2 pt-3 border-t border-slate-800 text-xs text-slate-300">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">Fizyczna próba przedprodukcyjna:</span>
+                  <span class="font-bold text-emerald-400">0 zł (W cenie)</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">Szacowany czas realizacji:</span>
+                  <span class="font-bold text-white">2 — 4 dni robocze</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">Znakowanie na maszynach:</span>
+                  <span class="font-bold text-white">Tajima (Japonia) / DTF HD</span>
+                </div>
+              </div>
+
+              <!-- Current Summary Tags -->
+              <div id="live-summary-tags" class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-800">
+                <span class="text-xs bg-slate-800 text-blue-300 border border-slate-700 px-2.5 py-1 rounded">Haft Tajima</span>
+                <span class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded">Pierś (do 10cm)</span>
+                <span class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded">Ilość: 30 szt.</span>
+              </div>
+            </div>
+
+            <!-- Contact & File Upload Fields -->
+            <div class="space-y-4 pt-4 border-t border-slate-800">
+              <!-- Upload Area -->
+              <div>
+                <label class="block text-xs font-bold text-slate-200 mb-1.5">Projekt graficzny lub logo (opcjonalnie):</label>
+                <div class="border border-slate-700 hover:border-blue-500 rounded-xl p-3.5 sm:p-4 text-center cursor-pointer bg-slate-800/90 transition-colors active:bg-slate-700" onclick="document.getElementById('calc-file-input').click()">
+                  <input class="hidden" id="calc-file-input" type="file"/>
+                  <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-400 mx-auto mb-1"></i>
+                  <div id="file-upload-status" class="text-xs font-bold text-white transition-colors">Wybierz lub przeciągnij plik projektu</div>
+                  <div class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Formaty: PDF, AI, CDR, SVG, EPS, PNG min. 300 DPI</div>
+                </div>
+              </div>
+
+              <!-- Inputs -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-200 mb-1">Numer telefonu *</label>
+                  <input class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="+48 000 000 000" required="" type="tel"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-200 mb-1">Adres e-mail *</label>
+                  <input class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="twoja@firma.pl" required="" type="email"/>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-200 mb-1">Uwagi do zlecenia (kolor odzieży, wymiary, specyfikacja):</label>
+                <textarea class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500" placeholder="Np. 30 sztuk czarnych polary z haftem na piersi + 10 czapek..." rows="2"></textarea>
+              </div>
+
+              <!-- Submit button -->
+              <button class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-lg py-3.5 px-6 font-bold text-sm flex items-center justify-center gap-2 tactile-btn shadow-xs min-h-[48px]" type="submit">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span>Wyślij zapytanie o wiążącą wycenę w 24h</span>
+              </button>
+
+              <!-- Feedback message -->
+              <div id="calc-form-feedback" class="hidden rounded-xl bg-emerald-950 border border-emerald-500/50 p-4 text-center text-xs font-medium text-emerald-200">
+                ✓ Dziękujemy! Otrzymaliśmy specyfikację Twojego zlecenia. Odpowiemy ze szczegółowym kosztorysem w ciągu 24 godzin.
+              </div>
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+    </section>
+
+    <!-- RECENT REALIZATIONS SHOWROOM (Lookbook Gallery) -->
+    <section class="w-full bg-slate-100/70 px-4 sm:px-6 lg:px-12 py-12 sm:py-20 lg:py-28 border-b border-slate-200 scroll-mt-16 sm:scroll-mt-20" id="realizacje">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6 pb-6 border-b border-slate-300">
+          <div>
+            <span class="text-xs font-bold text-blue-600 block mb-1 tracking-wider">
+              Portfolio
+            </span>
+            <h2 class="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-slate-950 tracking-tight">
               Ostatnie Realizacje
             </h2>
           </div>
-          <div class="flex items-center gap-2 text-xs text-slate-600 font-medium">
-            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+          <div class="flex items-center gap-2 text-xs text-slate-700 font-bold">
+            <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
             <span>Dokumentacja z pracowni w Krzyszkowicach</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           
-          <div class="space-y-4">
-            <div class="aspect-[4/3] w-full bg-slate-100 rounded-xl overflow-hidden shadow-xs">
-              <img alt="Emblemat na softshellu" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1V50UuOHtc4oHAciXpFc8scZCwISYQ1-5-OAbesBd_1xvuCUbKv24Sc7T_yZ_zMGHmqH2Y1zRHa0WQs695pOSUePQlL5SW9GvrmtOBbCYE1N_58q08Z3gM9Jny0MXR7t3nN-Inz0UvJPlmE1BnPmiTCWNJuUaWIXz8A-yi6XYljz2NpZGmwGLi6_coYdbezgsa1t6SHVOEBBO7vgzLFNwft8p6JHnEt9oDWBtxTM6t90qO3zOB_O5yS_953"/>
+          <!-- Realizacja 1: KM-Bud Softshell -->
+          <div class="group space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+              <img alt="Kurtka softshell z nadrukiem KM-Bud Ogrodzenia" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/kmbud-softshell.jpg" loading="lazy"/>
             </div>
             <div>
-              <div class="text-xs text-blue-700 font-bold uppercase">Odzież Outdoor</div>
-              <h3 class="font-bold text-base text-slate-900 mt-1">Emblemat wielokolorowy na softshellu</h3>
-              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                Zastosowano podkład hydrofobowy zapobiegający naruszeniu membrany tkaniny technicznej.
+              <div class="text-xs text-blue-700 font-bold">Odzież Robocza &amp; Softshell</div>
+              <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-1">Kurtka Softshell KM-Bud Ogrodzenia</h3>
+              <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Wytrzymały termotransfer DTF w wyrazistej kolorystyce, odporny na trudne warunki pogodowe i intensywne użytkowanie.
               </p>
-              <div class="mt-3 text-xs text-slate-500 font-medium flex justify-between">
-                <span>Nici: Madeira 40</span>
-                <span class="text-slate-900 font-bold">Seria: 250 szt.</span>
+              <div class="mt-4 text-xs text-slate-500 font-medium flex justify-between border-t border-slate-200 pt-3">
+                <span class="font-semibold text-slate-600">Druk: DTF HD</span>
+                <span class="text-slate-900 font-extrabold">KM-Bud Ogrodzenia</span>
               </div>
             </div>
           </div>
 
-          <div class="space-y-4">
-            <div class="aspect-[4/3] w-full bg-slate-100 rounded-xl overflow-hidden shadow-xs">
-              <img alt="Bluza streetwear DTF" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XKvUBauTotgBYJbt9kXkqHy6hJGrc0IGgQ1DRDpw6Pgpdt24kVVN-0GVP1DjvCqzD5RchN7_s1n5yp5SsvT9QHhJkHvH15_-LHR9WbUKO1-nYqoDniKhstoaoV31OpXyLAY3FZUnE8zf-jplQFOypQGCEW0RpjhUnUDpEaDq06Rfi3zU-DN6xpkGuW02SHIkiBkPreoF53HODvj4V5wV92SRQIqpvdbFQ4bl9chBClLR7PhbQNbqup4-M"/>
+          <!-- Realizacja 2: Nowak Polar i Czapka -->
+          <div class="group space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+              <img alt="Haft na polarze i czapce Nowak Warzywa" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/nowak-polar-haft.jpg" loading="lazy"/>
             </div>
             <div>
-              <div class="text-xs text-blue-700 font-bold uppercase">Marka Odzieżowa</div>
-              <h3 class="font-bold text-base text-slate-900 mt-1">Typograficzna bluza oversize 420g</h3>
-              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                Termotransfer polimerowy o dużej elastyczności. Miękki w dotyku, wysoka trwałość bieli po praniu.
+              <div class="text-xs text-blue-700 font-bold">Haft Komputerowy &amp; Polary</div>
+              <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-1">Komplet: Polar i czapka Nowak Warzywa</h3>
+              <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Wielobarwny, gęsty haft niciowy na ciepłym polarze oraz dopasowana kolorystycznie czapka trucker z logo.
               </p>
-              <div class="mt-3 text-xs text-slate-500 font-medium flex justify-between">
-                <span>Druk: DTF HD</span>
-                <span class="text-slate-900 font-bold">Seria: 500 szt.</span>
+              <div class="mt-4 text-xs text-slate-500 font-medium flex justify-between border-t border-slate-200 pt-3">
+                <span class="font-semibold text-slate-600">Nici: Madeira Polyneon</span>
+                <span class="text-slate-900 font-extrabold">Nowak Warzywa</span>
               </div>
             </div>
           </div>
 
-          <div class="space-y-4">
-            <div class="aspect-[4/3] w-full bg-slate-100 rounded-xl overflow-hidden shadow-xs">
-              <img alt="Koszulki polo B2B z haftem" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1U9g0Wh0uDd4MkjwdRm8KVNZ58a6epvyq7_RxiY-KZN6phJKdF8edopS1xTxu3Ml9aCKzL5mwEhniW8vUD5utteP3_jzBDhUof1Ky_6FqOtvMctwtI0ww1jDbfsHk-BaxTSOoILh6B3hyRwff9FS4ygdZ9mMUmdKGZlR11KuEe766T4dCXmuEzO0EKUeK9cvrYUJYYzCnSX6xvk9oL_mpxzrHIuzjNPtI6OJShF3umQ9-EvlNouFGpfwGGK"/>
+          <!-- Realizacja 3: Pizza w Gaju -->
+          <div class="group space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+              <img alt="Czapki i t-shirty Pizza w Gaju" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/pizzawgaju-gastronomia.jpg" loading="lazy"/>
             </div>
             <div>
-              <div class="text-xs text-blue-700 font-bold uppercase">Odzież dla Firm</div>
-              <h3 class="font-bold text-base text-slate-900 mt-1">Zestaw Polo i Kurtki Firmowe</h3>
-              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                Dostawa gotowej odzieży bezpośrednio z magazynu wraz z trwałym haftem logo na piersi i rękawie.
+              <div class="text-xs text-blue-700 font-bold">Gastronomia &amp; HoReCa</div>
+              <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-1">Zestaw dla gastronomii: Pizza w Gaju</h3>
+              <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Precyzyjny haft trójkolorowy na czapkach trucker oraz trwałe t-shirty bawełniane dla personelu pizzerii.
               </p>
-              <div class="mt-3 text-xs text-slate-500 font-medium flex justify-between">
-                <span>Haft: 6 500 ściegów</span>
-                <span class="text-slate-900 font-bold">Seria: 120 kpl.</span>
+              <div class="mt-4 text-xs text-slate-500 font-medium flex justify-between border-t border-slate-200 pt-3">
+                <span class="font-semibold text-slate-600">Haft + T-shirty</span>
+                <span class="text-slate-900 font-extrabold">Pizza w Gaju</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realizacja 4: Nowak Czapki -->
+          <div class="group space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+              <img alt="Czapki trucker z haftem Nowak Warzywa i Nowak Box" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/nowak-warzywa-czapki.jpg" loading="lazy"/>
+            </div>
+            <div>
+              <div class="text-xs text-blue-700 font-bold">Czapki z daszkiem &amp; Akcesoria</div>
+              <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-1">Czapki Trucker Nowak Box &amp; Nowak</h3>
+              <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Kolekcja czapek z siatką w wariantach kolorystycznych z trwałym haftem logo odpornym na deformacje.
+              </p>
+              <div class="mt-4 text-xs text-slate-500 font-medium flex justify-between border-t border-slate-200 pt-3">
+                <span class="font-semibold text-slate-600">Haft Tajima</span>
+                <span class="text-slate-900 font-extrabold">Nowak Box</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realizacja 5: Stalcore -->
+          <div class="group space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+              <img alt="T-shirty firmowe Stalcore Konstrukcje Stalowe" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/stalcore-workwear.jpg" loading="lazy"/>
+            </div>
+            <div>
+              <div class="text-xs text-blue-700 font-bold">Odzież Firmowa &amp; B2B</div>
+              <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-1">T-shirty firmowe Stalcore Konstrukcje</h3>
+              <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Dostawa koszulek Malfini 100% bawełna z dużym brandingiem na plecach i dyskretnym logo na piersi.
+              </p>
+              <div class="mt-4 text-xs text-slate-500 font-medium flex justify-between border-t border-slate-200 pt-3">
+                <span class="font-semibold text-slate-600">Druk DTF + Malfini</span>
+                <span class="text-slate-900 font-extrabold">Stalcore</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realizacja 6: Promyk Torby -->
+          <div class="group space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
+              <img alt="Torby bawełniane z nadrukiem Promyk" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" src="images/promyk-torby-reklamowe.jpg" loading="lazy"/>
+            </div>
+            <div>
+              <div class="text-xs text-blue-700 font-bold">Gadżety Reklamowe &amp; Eko</div>
+              <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-1">Torby bawełniane Promyk Rolety-Żaluzje</h3>
+              <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Płócienne torby bawełniane (canvas 220g) z wyrazistym logo, idealne na targi, eventy i materiały firmowe.
+              </p>
+              <div class="mt-4 text-xs text-slate-500 font-medium flex justify-between border-t border-slate-200 pt-3">
+                <span class="font-semibold text-slate-600">Trwały nadruk</span>
+                <span class="text-slate-900 font-extrabold">Promyk Rolety</span>
               </div>
             </div>
           </div>
@@ -630,80 +982,184 @@
       </div>
     </section>
 
-    <!-- LOGISTICS & WORKSHOP CONTACT -->
-    <section class="w-full bg-white px-6 lg:px-12 py-20 lg:py-28" id="kontakt">
+    <!-- LOGISTICS & WORKSHOP CONTACT (Direct Consultation Form & Location) -->
+    <section class="w-full bg-white px-4 sm:px-6 lg:px-12 py-12 sm:py-20 lg:py-28 scroll-mt-16 sm:scroll-mt-20" id="kontakt">
       <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-4 sm:gap-6 pb-6 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-bold text-blue-600 block mb-1 tracking-wider">
+              Lokalizacja &amp; bezpośredni kontakt
+            </span>
+            <h2 class="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-slate-950 tracking-tight">
+              Pracownia &amp; Park Maszynowy w Krzyszkowicach
+            </h2>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 max-w-md font-medium">
+            Produkcja i punkt odbioru zlokalizowane przy trasie S7 Zakopianka: 20 minut z południa Krakowa, 5 minut z centrum Myślenic.
+          </p>
+        </div>
+
+        <!-- 4 Quick Direct Contact Pillars -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12">
           
-          <!-- Left Column: Address & Workshop Info -->
-          <div class="lg:col-span-6 space-y-8">
+          <!-- Infolinia -->
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center gap-2 text-blue-600 mb-1.5 sm:mb-2">
+              <i data-lucide="phone-call" class="w-4 h-4"></i>
+              <span class="text-xs font-bold tracking-wide">Infolinia produkcyjna</span>
+            </div>
             <div>
-              <span class="text-xs font-bold text-blue-600 uppercase block mb-1">Lokalizacja &amp; Odbiory</span>
-              <h2 class="font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
-                Pracownia w Krzyszkowicach
-              </h2>
-              <p class="text-sm text-slate-600 mt-2 leading-relaxed max-w-lg">
-                Główny park maszynowy i punkt odbioru zlokalizowane są bezpośrednio przy trasie S7 (Zakopianka). Dogodny dojazd: 20 minut z południa Krakowa, 5 minut z centrum Myślenic.
+              <a class="block font-bold text-lg sm:text-xl text-slate-900 hover:text-blue-600 transition-colors py-0.5" href="tel:+48513770517">
+                +48 513 770 517
+              </a>
+              <span class="text-xs text-slate-500 block mt-0.5">Pn — Pt: 08:00 — 17:00</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center gap-2 text-blue-600 mb-1.5 sm:mb-2">
+              <i data-lucide="mail" class="w-4 h-4"></i>
+              <span class="text-xs font-bold tracking-wide">Wyceny &amp; Pliki CAD</span>
+            </div>
+            <div>
+              <a class="block font-bold text-base sm:text-lg text-slate-900 hover:text-blue-600 transition-colors truncate py-0.5" href="mailto:biuro@gghaft.pl">
+                biuro@gghaft.pl
+              </a>
+              <span class="text-xs text-slate-500 block mt-0.5">Gwarantowana wycena w 24h</span>
+            </div>
+          </div>
+
+          <!-- Lokalizacja -->
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center gap-2 text-blue-600 mb-1.5 sm:mb-2">
+              <i data-lucide="map-pin" class="w-4 h-4"></i>
+              <span class="text-xs font-bold tracking-wide">Adres Pracowni</span>
+            </div>
+            <div>
+              <div class="font-bold text-sm sm:text-base text-slate-900">Krzyszkowice 388</div>
+              <span class="text-xs text-slate-500 block mt-0.5">32-445 Krzyszkowice k. Myślenic</span>
+            </div>
+          </div>
+
+          <!-- Dojazd S7 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center gap-2 text-blue-600 mb-1.5 sm:mb-2">
+              <i data-lucide="navigation" class="w-4 h-4"></i>
+              <span class="text-xs font-bold tracking-wide">Dojazd Zakopianką</span>
+            </div>
+            <div>
+              <div class="font-bold text-sm sm:text-base text-slate-900">20 min z Krakowa</div>
+              <span class="text-xs text-slate-500 block mt-0.5">5 min z Myślenic (Węzeł S7)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Main Workspace: Form & Map/Logistics (12 Cols Grid) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          
+          <!-- Left Column: Direct Consultation Form (6 Cols) -->
+          <div class="lg:col-span-6 p-4 sm:p-6 lg:p-8 rounded-2xl bg-slate-50 border border-slate-200 space-y-5 sm:space-y-6">
+            <div>
+              <span class="text-xs font-bold text-blue-600 tracking-wide block mb-1">Szybki kontakt z technologiem</span>
+              <h3 class="font-headline font-extrabold text-xl sm:text-2xl text-slate-900">Zadaj pytanie lub skonsultuj projekt</h3>
+              <p class="text-xs text-slate-600 mt-1.5 max-w-md leading-relaxed">
+                Masz nietypowy materiał, potrzebujesz ekspresowej realizacji lub chcesz sprawdzić dostępność odzieży w hurtowni? Napisz do nas.
               </p>
             </div>
 
-            <div class="space-y-6 pt-4 border-t border-slate-100">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <form class="space-y-4" onsubmit="event.preventDefault(); const fb = document.getElementById('contact-form-feedback'); if(fb){ fb.classList.remove('hidden'); fb.classList.remove('animate-alert-enter'); void fb.offsetWidth; fb.classList.add('animate-alert-enter'); }">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <span class="text-xs font-bold text-blue-700 uppercase block mb-1">Adres Pracowni:</span>
-                  <div class="text-sm font-semibold text-slate-900">GG HAFT Grzegorz Galas</div>
-                  <div class="text-sm text-slate-600">Krzyszkowice 388</div>
-                  <div class="text-sm text-slate-600">32-445 Krzyszkowice</div>
-                  <div class="text-xs text-slate-500 mt-1">Woj. Małopolskie (pow. myślenicki)</div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Imię i Nazwisko / Firma *</label>
+                  <input class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-slate-800 focus:outline-none focus:border-blue-600 min-h-[44px]" placeholder="Jan Kowalski" required="" type="text"/>
                 </div>
                 <div>
-                  <span class="text-xs font-bold text-blue-700 uppercase block mb-1">Godziny Odbiorów:</span>
-                  <div class="text-sm font-semibold text-slate-900">Poniedziałek — Piątek</div>
-                  <div class="text-sm font-bold text-slate-800">08:00 — 17:00</div>
-                  <div class="text-xs text-slate-500 mt-1">Bezpłatny parking pod rampą załadunkową</div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Telefon kontaktowy *</label>
+                  <input class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-slate-800 focus:outline-none focus:border-blue-600 min-h-[44px]" placeholder="+48 000 000 000" required="" type="tel"/>
                 </div>
               </div>
-              
-              <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <span class="text-xs text-slate-500 block uppercase font-medium">Infolinia produkcyjna:</span>
-                  <a class="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors" href="tel:+48513770517">+48 513 770 517</a>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Adres e-mail *</label>
+                  <input class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-slate-800 focus:outline-none focus:border-blue-600 min-h-[44px]" placeholder="twoja@firma.pl" required="" type="email"/>
                 </div>
-                <a class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium tactile-btn" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
-                  <span class="material-symbols-outlined text-[16px]">directions</span>
-                  <span>Nawiguj do pracowni</span>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Temat zapytania</label>
+                  <select class="w-full rounded-lg border border-slate-300 bg-white px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-800 focus:outline-none focus:border-blue-600 min-h-[44px]">
+                    <option value="konsultacja">Dobór metody (Haft vs DTF)</option>
+                    <option value="termin">Zapytanie o termin ekspresowy</option>
+                    <option value="proba">Próba przedprodukcyjna</option>
+                    <option value="katalog">Dostawa odzieży z katalogu</option>
+                    <option value="inne">Inne pytanie techniczne</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Treść zapytania *</label>
+                <textarea class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-base sm:text-sm text-slate-800 focus:outline-none focus:border-blue-600" placeholder="Opisz swoje zapytanie, nakład lub rodzaj materiału..." required="" rows="3"></textarea>
+              </div>
+
+              <button class="w-full bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white rounded-lg py-3.5 px-6 font-bold text-sm flex items-center justify-center gap-2 tactile-btn shadow-xs min-h-[48px]" type="submit">
+                <i data-lucide="send" class="w-4 h-4 text-blue-400"></i>
+                <span>Wyślij wiadomość do pracowni</span>
+              </button>
+
+              <div id="contact-form-feedback" class="hidden rounded-xl bg-emerald-50 border border-emerald-300 p-4 text-center text-xs font-semibold text-emerald-900">
+                ✓ Dziękujemy! Twoja wiadomość została wysłana do pracowni. Skontaktujemy się z Tobą telefonicznie lub mailowo w ciągu kilku godzin.
+              </div>
+            </form>
+          </div>
+
+          <!-- Right Column: Map Showcase & Logistics Details (6 Cols) -->
+          <div class="lg:col-span-6 space-y-5 sm:space-y-6">
+            
+            <!-- Map Card with Direct Action -->
+            <div class="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 space-y-3 p-3.5 sm:p-4">
+              <div class="w-full h-48 sm:h-56 rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100">
+                <div class="w-full h-full bg-cover bg-center" data-location="Krzyszkowice 388, 32-445 Krzyszkowice" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuASmsO4vMFlyCgO77dg66A21aLSFMXfEcjZOPgj6IqLs796iX3KaneH7xqQimWUkqeCxY0m2clA8GG-CwI7dgMTmDSy0vrBO-5Ou2_156rdMOCaYvCZcxYdv4ecgpQjF4Y-bcAbad2mkQKHuumvr83W_GC_yzOce-uo8yNZL1aR2_wxebko_fDIdO8pQ0J9BaUQlW1kVY4H8hv-jKmmGLIz6WLuKR_Nm3E197kgUnYO')"></div>
+              </div>
+              
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <div>
+                  <span class="font-bold text-sm text-slate-900 block">Zjazd: Węzeł Krzyszkowice S7</span>
+                  <span class="text-[11px] sm:text-xs text-slate-500">GPS: 49.8824° N, 19.9298° E (Bezpośrednio przy Zakopiance)</span>
+                </div>
+                <a class="inline-flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tactile-btn whitespace-nowrap min-h-[44px]" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
+                  <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+                  <span>Nawiguj w Google Maps</span>
                 </a>
               </div>
             </div>
 
-            <!-- Logistics features (Flat rows) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div class="flex items-center gap-3 text-xs">
-                <span class="material-symbols-outlined text-blue-600 text-2xl">local_shipping</span>
+            <!-- Logistics Capabilities -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="truck" class="w-5 h-5"></i>
+                </div>
                 <div>
-                  <span class="font-bold text-slate-900 block">Wysyłka kurierska 24h</span>
-                  <span class="text-slate-600">DPD / InPost / Palety Raben</span>
+                  <span class="font-bold text-slate-900 block text-xs">Wysyłka kurierska 24h</span>
+                  <span class="text-[11px] sm:text-xs text-slate-600">Nadania DPD, InPost Paczkomaty oraz palety Raben codziennie.</span>
                 </div>
               </div>
-              <div class="flex items-center gap-3 text-xs">
-                <span class="material-symbols-outlined text-blue-600 text-2xl">warehouse</span>
-                <div>
-                  <span class="font-bold text-slate-900 block">Rampa rozładunkowa</span>
-                  <span class="text-slate-600">Podjazd dla aut dostawczych</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Right Column: Clean Map Showcase -->
-          <div class="lg:col-span-6 space-y-3">
-            <div class="w-full h-[360px] rounded-xl overflow-hidden shadow-xs relative bg-slate-100">
-              <div class="w-full h-full bg-cover bg-center" data-location="Krzyszkowice 388, 32-445 Krzyszkowice" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuASmsO4vMFlyCgO77dg66A21aLSFMXfEcjZOPgj6IqLs796iX3KaneH7xqQimWUkqeCxY0m2clA8GG-CwI7dgMTmDSy0vrBO-5Ou2_156rdMOCaYvCZcxYdv4ecgpQjF4Y-bcAbad2mkQKHuumvr83W_GC_yzOce-uo8yNZL1aR2_wxebko_fDIdO8pQ0J9BaUQlW1kVY4H8hv-jKmmGLIz6WLuKR_Nm3E197kgUnYO')"></div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="warehouse" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <span class="font-bold text-slate-900 block text-xs">Rampa &amp; Parking</span>
+                  <span class="text-[11px] sm:text-xs text-slate-600">Bezpłatny podjazd manewrowy dla aut dostawczych i busów.</span>
+                </div>
+              </div>
             </div>
-            <div class="flex items-center justify-between text-xs text-slate-600 px-1">
-              <span class="font-bold text-slate-900">Zjazd: Węzeł Krzyszkowice S7</span>
-              <span class="text-slate-500">GPS: 49.8824° N, 19.9298° E (20 min z Krakowa)</span>
-            </div>
+
           </div>
 
         </div>
@@ -712,28 +1168,31 @@
 
   </main>
 
-  <!-- CLEAN FOOTER -->
-  <footer class="w-full bg-slate-900 text-white mt-auto">
-    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
+  <!-- CLEAN HIGH-CONTRAST FOOTER -->
+  <footer class="w-full bg-slate-950 text-white mt-auto border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10">
       
       <!-- Company Summary -->
       <div class="lg:col-span-4 flex flex-col gap-3">
-        <div class="flex items-center gap-3">
-          <img alt="GGhaft Monogram" class="h-7 w-auto object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida/AEtjO1UC2Y7g1SmvQi1pKOXjahbQvFMX6lL2s83XCD_WF9GDCNcA2dmp23RQo1rwuNisvBU9WvInVsFUr0CSXUY86TnOoha1rrHfi0EOMsj6XTCwpHQI1Vyx5vyRsurVZbKeZXx8dBDSTLWzhGIrhlFiFnLN7d7mMGQZpZ--jQf-3m9mqIYcPKQoQuUdY9G1yQWs-dKnl5-33EuY8tRQ_JrvW1te5q2YnTF7qVgRQrEQIRUYeLoX74rJtUlJrcj0"/>
-          <span class="font-extrabold text-lg tracking-tight text-white">GGHAFT</span>
-        </div>
+        <a class="flex items-center gap-3 group inline-flex" href="#" aria-label="GGhaft Strona Główna">
+          <img alt="GGhaft Logo" class="h-9 sm:h-11 w-auto object-contain" src="images/logo-white-tight.png"/>
+          <div class="flex flex-col border-l border-slate-700 pl-3 justify-center">
+            <span class="font-headline font-extrabold text-xl tracking-tight text-white leading-none">GGHAFT</span>
+            <span class="text-xs font-semibold text-slate-400 tracking-wide mt-1">Haft Przemysłowy &amp; DTF</span>
+          </div>
+        </a>
         <p class="text-xs text-slate-400 leading-relaxed max-w-sm mt-1">
           Wyspecjalizowana pracownia haftu komputerowego i druku DTF. Standardy odporności na pranie przemysłowe, cyfrowe programowanie CAD i dostawa odzieży reklamowej dla firm.
         </p>
-        <div class="flex items-center gap-2 mt-2 text-xs text-slate-400 font-medium">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <div class="flex items-center gap-2 mt-1 text-xs text-slate-300 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
           <span>Park maszynowy w Krzyszkowicach</span>
         </div>
       </div>
 
       <!-- Registration & Data -->
       <div class="lg:col-span-3 flex flex-col gap-2">
-        <h3 class="text-xs font-bold uppercase text-slate-200 tracking-wider">Dane Firmy &amp; Rejestr</h3>
+        <h3 class="text-xs font-bold text-slate-200 tracking-wider">Dane Firmy &amp; Rejestr</h3>
         <div class="text-xs text-slate-300 space-y-1 mt-1">
           <p class="font-semibold text-white">GG HAFT Grzegorz Galas</p>
           <p>Krzyszkowice 388</p>
@@ -747,7 +1206,7 @@
 
       <!-- Working Hours -->
       <div class="lg:col-span-2 flex flex-col gap-2">
-        <h3 class="text-xs font-bold uppercase text-slate-200 tracking-wider">Godziny Odbiorów</h3>
+        <h3 class="text-xs font-bold text-slate-200 tracking-wider">Godziny Odbiorów</h3>
         <div class="text-xs text-slate-300 space-y-1 mt-1">
           <p class="font-semibold text-white">Pn — Pt: 08:00 — 17:00</p>
           <p class="text-slate-300 text-xs">Dojazd bez korków trasą S7</p>
@@ -757,28 +1216,310 @@
 
       <!-- Quick Nav -->
       <div class="lg:col-span-3 flex flex-col gap-2">
-        <h3 class="text-xs font-bold uppercase text-slate-200 tracking-wider">Nawigacja</h3>
-        <ul class="text-xs space-y-2 text-slate-300 mt-1">
-          <li><a class="hover:text-white transition-colors" href="#uslugi">Technologie Znakowania</a></li>
-          <li><a class="hover:text-white transition-colors" href="#realizacje">Portfolio &amp; Próbki Haftu</a></li>
-          <li><a class="hover:text-white transition-colors" href="#kalkulator">Formularz Wyceny Ekspresowej</a></li>
-          <li><a class="hover:text-white transition-colors" href="#standard">Standard Jakości Maszynowej</a></li>
-          <li><a class="hover:text-white transition-colors" href="#kontakt">Dojazd Zakopianka S7</a></li>
+        <h3 class="text-xs font-bold text-slate-200 tracking-wider">Nawigacja</h3>
+        <ul class="text-xs space-y-2.5 text-slate-300 mt-1">
+          <li>
+            <a class="inline-flex items-center gap-2 hover:text-white transition-colors group py-1" href="#uslugi">
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+              <span>Technologie Znakowania</span>
+            </a>
+          </li>
+          <li>
+            <a class="inline-flex items-center gap-2 hover:text-white transition-colors group py-1" href="#realizacje">
+              <i data-lucide="image" class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+              <span>Portfolio &amp; Próbki Haftu</span>
+            </a>
+          </li>
+          <li>
+            <a class="inline-flex items-center gap-2 hover:text-white transition-colors group py-1" href="#kalkulator">
+              <i data-lucide="calculator" class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+              <span>Formularz Wyceny Ekspresowej</span>
+            </a>
+          </li>
+          <li>
+            <a class="inline-flex items-center gap-2 hover:text-white transition-colors group py-1" href="#standard">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+              <span>Standard Jakości Maszynowej</span>
+            </a>
+          </li>
+          <li>
+            <a class="inline-flex items-center gap-2 hover:text-white transition-colors group py-1" href="#kontakt">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+              <span>Dojazd Zakopianka S7</span>
+            </a>
+          </li>
         </ul>
       </div>
 
     </div>
 
     <!-- Integrated Copyright Row -->
-    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 text-center sm:text-left">
       <div>© 2024 GGhaft Grzegorz Galas. Wszelkie prawa zastrzeżone.</div>
-      <div class="flex items-center gap-4 font-medium">
+      <div class="flex items-center gap-3 sm:gap-4 font-medium justify-center">
         <span>Krzyszkowice / Myślenice / Kraków</span>
         <span>•</span>
-        <span>Haft Komputerowy &amp; Druk DTF</span>
+        <span>Haft Komputerowy &amp; DTF</span>
       </div>
     </div>
   </footer>
+
+  <!-- MOBILE FLOATING ACTION BAR (Bottom Bar for Quick Access on Mobile) -->
+  <aside aria-label="Szybki kontakt mobilny" class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 flex sm:hidden gap-2.5 items-center justify-between shadow-2xl safe-bottom">
+    <a href="tel:+48513770517" class="flex-1 flex items-center justify-center gap-2 bg-slate-900 active:bg-slate-800 text-white rounded-xl py-3 px-3 text-xs font-bold tactile-btn shadow-xs">
+      <i data-lucide="phone" class="w-4 h-4 text-blue-400"></i>
+      <span>Zadzwoń</span>
+    </a>
+    <a href="#kalkulator" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl py-3 px-3 text-xs font-bold tactile-btn shadow-xs">
+      <i data-lucide="calculator" class="w-4 h-4"></i>
+      <span>Wycena 24h</span>
+    </a>
+  </aside>
+
+  <!-- Lucide Icon Initialization & Interactive Scripts -->
+  <script>
+    function initIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      initIcons();
+
+      // 1. Mobile Menu Smooth Drawer Toggle
+      const menuBtn = document.getElementById("mobile-menu-btn");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const menuIconWrap = document.getElementById("menu-icon-wrap");
+      const closeIconWrap = document.getElementById("close-icon-wrap");
+      const navLinks = document.querySelectorAll(".mobile-nav-link");
+
+      function openMobileMenu() {
+        if (!mobileMenu || !menuBtn) return;
+        menuBtn.setAttribute("aria-expanded", "true");
+        mobileMenu.classList.add("menu-open");
+        mobileMenu.setAttribute("aria-hidden", "false");
+        if (menuIconWrap && closeIconWrap) {
+          menuIconWrap.classList.add("hidden");
+          closeIconWrap.classList.remove("hidden");
+        }
+      }
+
+      function closeMobileMenu() {
+        if (!mobileMenu || !menuBtn) return;
+        menuBtn.setAttribute("aria-expanded", "false");
+        mobileMenu.classList.remove("menu-open");
+        mobileMenu.setAttribute("aria-hidden", "true");
+        if (menuIconWrap && closeIconWrap) {
+          menuIconWrap.classList.remove("hidden");
+          closeIconWrap.classList.add("hidden");
+        }
+      }
+
+      if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+          if (isExpanded) {
+            closeMobileMenu();
+          } else {
+            openMobileMenu();
+          }
+        });
+
+        navLinks.forEach(function(link) {
+          link.addEventListener("click", closeMobileMenu);
+        });
+
+        // Close on clicking anywhere outside
+        document.addEventListener("click", function(e) {
+          if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+            closeMobileMenu();
+          }
+        });
+      }
+
+      // 2. Industrial Metric Counters on Scroll
+      const metricCounters = document.querySelectorAll(".metric-counter");
+      if (metricCounters.length > 0) {
+        const observer = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const target = parseInt(el.getAttribute("data-target"), 10);
+              const format = el.getAttribute("data-format");
+              const duration = 900;
+              const startTime = performance.now();
+
+              function updateMetric(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // cubic-bezier(0.16, 1, 0.3, 1) approx easeOutExpo
+                const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                const current = Math.round(target * ease);
+                
+                if (format === "spaced") {
+                  el.textContent = current.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                } else {
+                  el.textContent = current.toString();
+                }
+
+                if (progress < 1) {
+                  requestAnimationFrame(updateMetric);
+                } else {
+                  if (format === "spaced") {
+                    el.textContent = target.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                  } else {
+                    el.textContent = target.toString();
+                  }
+                }
+              }
+
+              requestAnimationFrame(updateMetric);
+              obs.unobserve(el);
+            }
+          });
+        }, { threshold: 0.3 });
+
+        metricCounters.forEach(counter => observer.observe(counter));
+      }
+
+      // 3. Interactive Calculator Live Engine with Smooth Number Tween
+      const calcInputs = document.querySelectorAll(".calc-input");
+      const customQtyInput = document.getElementById("custom-qty-input");
+      const priceDisplay = document.getElementById("live-calc-price");
+      const tagsContainer = document.getElementById("live-summary-tags");
+      const fileInput = document.getElementById("calc-file-input");
+      const fileStatus = document.getElementById("file-upload-status");
+
+      let currentAnimatedPrice = 11.50;
+      let priceAnimationId = null;
+
+      function animatePrice(targetPrice) {
+        if (!priceDisplay) return;
+
+        if (priceAnimationId) {
+          cancelAnimationFrame(priceAnimationId);
+        }
+
+        // Trigger micro-pulse on price container
+        priceDisplay.classList.remove("animate-price-pulse");
+        void priceDisplay.offsetWidth; // force reflow
+        priceDisplay.classList.add("animate-price-pulse");
+
+        const startPrice = currentAnimatedPrice;
+        const duration = 220;
+        const startTime = performance.now();
+
+        function step(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+          const val = startPrice + (targetPrice - startPrice) * ease;
+          
+          priceDisplay.textContent = val.toFixed(2).replace('.', ',') + ' zł';
+
+          if (progress < 1) {
+            priceAnimationId = requestAnimationFrame(step);
+          } else {
+            currentAnimatedPrice = targetPrice;
+            priceDisplay.textContent = targetPrice.toFixed(2).replace('.', ',') + ' zł';
+          }
+        }
+
+        priceAnimationId = requestAnimationFrame(step);
+      }
+
+      function updateCalculator() {
+        if (!priceDisplay) return;
+
+        // 1. Technique base price
+        const selectedTech = document.querySelector('input[name="technique"]:checked');
+        const basePrice = selectedTech ? parseFloat(selectedTech.getAttribute("data-base") || 11.50) : 11.50;
+        const techName = selectedTech ? (selectedTech.value === 'haft' ? 'Haft Tajima' : selectedTech.value === 'dtf' ? 'Druk DTF' : 'Doradztwo') : 'Haft Tajima';
+
+        // 2. Placement multiplier
+        const selectedPlacement = document.querySelector('input[name="placement"]:checked');
+        const placementMult = selectedPlacement ? parseFloat(selectedPlacement.getAttribute("data-multiplier") || 1.0) : 1.0;
+        const placementName = selectedPlacement ? (selectedPlacement.value === 'small' ? 'Pierś (do 10cm)' : selectedPlacement.value === 'large' ? 'Plecy (do 28cm)' : '2 Pozycje (Przód+Tył)') : 'Pierś (do 10cm)';
+
+        // 3. Quantity tier
+        let qty = 30;
+        if (customQtyInput && customQtyInput.value) {
+          qty = parseInt(customQtyInput.value, 10) || 1;
+        }
+
+        let tierMult = 1.0;
+        if (qty < 10) {
+          tierMult = 1.55;
+        } else if (qty < 50) {
+          tierMult = 1.0;
+        } else if (qty < 200) {
+          tierMult = 0.75;
+        } else {
+          tierMult = 0.55;
+        }
+
+        // Calculate unit price
+        const targetCalculatedPrice = parseFloat((basePrice * placementMult * tierMult).toFixed(2));
+        animatePrice(targetCalculatedPrice);
+
+        // Update Summary Tags
+        if (tagsContainer) {
+          tagsContainer.innerHTML = `
+            <span class="text-xs bg-slate-800 text-blue-300 border border-slate-700 px-2.5 py-1 rounded transition-all">${techName}</span>
+            <span class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded transition-all">${placementName}</span>
+            <span class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded transition-all">Ilość: ${qty} szt.</span>
+          `;
+        }
+      }
+
+      // Quantity Tier Radio change syncs to number input
+      document.querySelectorAll('input[name="qty_tier"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+          if (this.checked && customQtyInput) {
+            customQtyInput.value = this.getAttribute('data-qty-val') || 30;
+            updateCalculator();
+          }
+        });
+      });
+
+      // Number input syncs to tier radios
+      if (customQtyInput) {
+        customQtyInput.addEventListener('input', function() {
+          const val = parseInt(this.value, 10) || 1;
+          const tierRadios = document.querySelectorAll('input[name="qty_tier"]');
+          tierRadios.forEach(r => {
+            if (val < 10 && r.value === '1-9') r.checked = true;
+            else if (val >= 10 && val < 50 && r.value === '10-49') r.checked = true;
+            else if (val >= 50 && val < 200 && r.value === '50-199') r.checked = true;
+            else if (val >= 200 && r.value === '200+') r.checked = true;
+          });
+          updateCalculator();
+        });
+      }
+
+      // Listen to all calculator input changes
+      calcInputs.forEach(input => {
+        input.addEventListener('change', updateCalculator);
+      });
+
+      // File upload feedback
+      if (fileInput && fileStatus) {
+        fileInput.addEventListener('change', function() {
+          if (this.files && this.files[0]) {
+            fileStatus.textContent = '✓ Załączono: ' + this.files[0].name;
+            fileStatus.classList.add('text-blue-400');
+          }
+        });
+      }
+
+      // Initialize calculation on load
+      updateCalculator();
+    });
+
+    initIcons();
+  </script>
 
 </body>
 </html>
